@@ -25,15 +25,30 @@ const Scene = () => {
     let isCancelled = false;
     if (canvasDiv.current) {
       let rect = canvasDiv.current.getBoundingClientRect();
-      let container = { width: rect.width, height: rect.height };
-      const aspect = container.width / container.height;
+      let width = rect.width;
+      let height = rect.height;
+      if (width === 0 || height === 0) {
+        width = canvasDiv.current.clientWidth || window.innerWidth;
+        height = canvasDiv.current.clientHeight || (window.innerWidth <= 768 ? window.innerHeight * 0.5 : window.innerHeight * 0.8);
+      }
+      const aspect = width / height;
       const scene = sceneRef.current;
 
-      const renderer = new THREE.WebGLRenderer({
-        alpha: true,
-        antialias: true,
-      });
-      renderer.setSize(container.width, container.height);
+      let renderer: THREE.WebGLRenderer;
+      try {
+        renderer = new THREE.WebGLRenderer({
+          alpha: true,
+          antialias: window.devicePixelRatio < 2, // Saves significant GPU load on retina screens without visual regression
+          powerPreference: "high-performance",
+          failIfMajorPerformanceCaveat: false,
+        });
+      } catch (e) {
+        console.error("WebGL Renderer initialization failed:", e);
+        setLoading(100);
+        return;
+      }
+
+      renderer.setSize(width, height);
       const maxPixelRatio = window.innerWidth <= 768 ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2);
       renderer.setPixelRatio(maxPixelRatio);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -54,11 +69,41 @@ const Scene = () => {
 
       const light = setLighting(scene);
       let progress = setProgress((value) => setLoading(value));
-      const { loadCharacter } = setCharacter(renderer, scene, camera);
+      const { loadCharacter } = setCharacter(renderer, scene, camera, (percent) => {
+        progress.setTarget(percent);
+      });
 
       let resizeListener: (() => void) | undefined;
       let resizeTimeout: any;
       let animationFrameId: number;
+
+      let isLandingVisible = true;
+      let isWhatIDoVisible = false;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.target.id === "landingDiv") {
+              isLandingVisible = entry.isIntersecting;
+            } else if (entry.target.classList.contains("whatIDO")) {
+              isWhatIDoVisible = entry.isIntersecting;
+            }
+          });
+        },
+        { threshold: 0 }
+      );
+
+      const landingDiv = document.getElementById("landingDiv");
+      if (landingDiv) observer.observe(landingDiv);
+      const whatIDoElement = document.querySelector(".whatIDO");
+      if (whatIDoElement) observer.observe(whatIDoElement);
+
+      const handleContextLost = (event: Event) => {
+        event.preventDefault();
+        console.warn("WebGL Context Lost");
+        cancelAnimationFrame(animationFrameId);
+      };
+      renderer.domElement.addEventListener("webglcontextlost", handleContextLost, false);
 
       loadCharacter().then((gltf) => {
         if (isCancelled) return;
@@ -91,6 +136,12 @@ const Scene = () => {
           };
           window.addEventListener("resize", resizeListener);
         }
+      }).catch((err) => {
+        console.error("Failed to load character:", err);
+        if (!isCancelled) {
+          setLoading(100);
+          progress.clear();
+        }
       });
 
       let mouse = { x: 0, y: 0 },
@@ -117,28 +168,15 @@ const Scene = () => {
       };
 
       document.addEventListener("mousemove", onMouseMove);
-      const landingDiv = document.getElementById("landingDiv");
       if (landingDiv) {
         landingDiv.addEventListener("touchstart", onTouchStart);
         landingDiv.addEventListener("touchend", onTouchEnd);
       }
-      let whatIDoSection: Element | null = null;
       const animate = () => {
         animationFrameId = requestAnimationFrame(animate);
-        if (canvasDiv.current) {
-          const canvasRect = canvasDiv.current.getBoundingClientRect();
-          if (canvasRect.bottom < 0 || canvasRect.top > window.innerHeight) {
-            return;
-          }
-        }
-        if (!whatIDoSection) {
-          whatIDoSection = document.querySelector(".whatIDO");
-        }
-        if (whatIDoSection) {
-          const rect = whatIDoSection.getBoundingClientRect();
-          if (rect.bottom < 0) {
-            return;
-          }
+        const isVisible = isLandingVisible || isWhatIDoVisible;
+        if (!isVisible) {
+          return;
         }
         if (headBone) {
           handleHeadRotation(
@@ -160,11 +198,13 @@ const Scene = () => {
       animate();
       return () => {
         isCancelled = true;
+        observer.disconnect();
         clearTimeout(debounce);
         clearTimeout(resizeTimeout);
         clearAllTimelines();
         cancelAnimationFrame(animationFrameId);
         scene.clear();
+        renderer.domElement.removeEventListener("webglcontextlost", handleContextLost);
         renderer.dispose();
         if (resizeListener) {
           window.removeEventListener("resize", resizeListener);

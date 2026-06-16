@@ -93,43 +93,48 @@ const Loading = ({ percent }: { percent: number }) => {
 export default Loading;
 
 export const setProgress = (setLoading: (value: number) => void) => {
-  let percent: number = 0;
+  let currentPercent = 0;
+  let targetPercent = 15; // Start at 15% immediately to show initial progress
+  let animationFrameId: number;
 
-  let interval = setInterval(() => {
-    if (percent <= 50) {
-      let rand = Math.round(Math.random() * 5);
-      percent = percent + rand;
-      setLoading(percent);
-    } else {
-      clearInterval(interval);
-      interval = setInterval(() => {
-        percent = percent + Math.round(Math.random());
-        setLoading(percent);
-        if (percent > 91) {
-          clearInterval(interval);
-        }
-      }, 2000);
+  const update = () => {
+    if (currentPercent < targetPercent) {
+      // Smoothly slide towards the target percentage
+      currentPercent += Math.min(2.5, (targetPercent - currentPercent) * 0.15 + 0.1);
+      if (currentPercent >= 100) {
+        currentPercent = 100;
+      }
+      setLoading(Math.round(currentPercent));
     }
-  }, 100);
+    animationFrameId = requestAnimationFrame(update);
+  };
+  animationFrameId = requestAnimationFrame(update);
 
-  function clear() {
-    clearInterval(interval);
-    setLoading(100);
+  function setTarget(value: number) {
+    // Map character download percentage (0-100) to the range 15-99%
+    const mapped = 15 + Math.round((value / 100) * 84);
+    if (mapped > targetPercent) {
+      targetPercent = Math.min(99, mapped);
+    }
   }
 
   function loaded() {
     return new Promise<number>((resolve) => {
-      clearInterval(interval);
-      interval = setInterval(() => {
-        if (percent < 100) {
-          percent++;
-          setLoading(percent);
-        } else {
-          resolve(percent);
-          clearInterval(interval);
+      targetPercent = 100;
+      const checkInterval = setInterval(() => {
+        if (currentPercent >= 100) {
+          clearInterval(checkInterval);
+          cancelAnimationFrame(animationFrameId);
+          resolve(100);
         }
-      }, 2);
+      }, 16);
     });
   }
-  return { loaded, percent, clear };
+
+  function clear() {
+    cancelAnimationFrame(animationFrameId);
+    setLoading(100);
+  }
+
+  return { loaded, clear, setTarget };
 };

@@ -164,26 +164,21 @@ const TechStack = () => {
     }, 100);
 
     const techstackElement = document.querySelector(".techstack");
-    const handleScroll = () => {
-      if (techstackElement) {
-        const rect = techstackElement.getBoundingClientRect();
-        setIsActive(rect.top < window.innerHeight && rect.bottom > 0);
-      }
-    };
-    document.querySelectorAll(".header a").forEach((elem) => {
-      const element = elem as HTMLAnchorElement;
-      element.addEventListener("click", () => {
-        const interval = setInterval(() => {
-          handleScroll();
-        }, 10);
-        setTimeout(() => {
-          clearInterval(interval);
-        }, 1000);
-      });
-    });
-    window.addEventListener("scroll", handleScroll);
+    let observer: IntersectionObserver;
+    if (techstackElement) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          setIsActive(entry.isIntersecting);
+        },
+        { threshold: 0 }
+      );
+      observer.observe(techstackElement);
+    }
+
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      if (observer) {
+        observer.disconnect();
+      }
       clearTimeout(timer);
     };
   }, []);
@@ -208,6 +203,7 @@ const TechStack = () => {
 
       <Canvas
         shadows
+        frameloop={isActive ? "always" : "never"}
         dpr={window.innerWidth <= 768 ? [1, 1.5] : [1, 2]}
         gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
         camera={{ position: [0, 0, cameraConfig.z], fov: cameraConfig.fov, near: 1, far: 100 }}

@@ -17,7 +17,8 @@
 .contact-flex {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  margin-top: 40px;
 }
 .contact-flex h4 {
   font-weight: 500;
@@ -147,14 +148,14 @@ a.contact-social {
   position: relative;
   margin-bottom: 25px;
   display: inline-block;
-  border-radius: 40px;
+  border-radius: 32px;
   background-color: #0b080c;
   padding: 0;
   /* Premium border styled like smartphone bezel in brand accent color */
-  border: 8px solid var(--accentColor);
+  border: 6px solid var(--accentColor);
   box-shadow: 
-    0 20px 45px rgba(0, 0, 0, 0.7),
-    0 0 30px var(--accentColor);
+    0 15px 35px rgba(0, 0, 0, 0.7),
+    0 0 25px var(--accentColor);
   transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   overflow: hidden;
 }
@@ -166,7 +167,7 @@ a.contact-social {
   background: radial-gradient(circle, var(--accentColor) 0%, transparent 75%);
   filter: blur(12px);
   z-index: -1;
-  border-radius: 44px;
+  border-radius: 36px;
   opacity: 0.4;
   pointer-events: none;
   transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -175,8 +176,8 @@ a.contact-social {
 .footer-photo-container:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: 
-    0 30px 60px rgba(0, 0, 0, 0.85),
-    0 0 45px var(--accentColor);
+    0 25px 50px rgba(0, 0, 0, 0.85),
+    0 0 35px var(--accentColor);
 }
 
 .footer-photo-container:hover::before {
@@ -185,11 +186,11 @@ a.contact-social {
 
 .mobile-island {
   position: absolute;
-  top: 15px;
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  width: 75px;
-  height: 18px;
+  width: 60px;
+  height: 14px;
   background-color: #0b080c;
   border-radius: 20px;
   z-index: 10;
@@ -205,43 +206,43 @@ a.contact-social {
 
 .footer-photo {
   display: block;
-  width: 420px;
-  height: 746px; /* Aspect ratio 9:16 for mobile screen layout */
+  width: 320px;
+  height: 569px; /* Aspect ratio 9:16 for mobile screen layout */
   object-fit: cover;
-  border-radius: 32px; /* Curves inside the 40px bezel */
+  border-radius: 26px; /* Curves inside the 32px bezel */
   opacity: 0.95;
   transition: border-color 0.4s ease;
 }
 
 @media only screen and (max-width: 1024px) {
   .footer-photo {
-    width: 340px;
-    height: 604px;
+    width: 270px;
+    height: 480px;
   }
   .footer-photo-container {
-    border-radius: 34px;
-    border-width: 6px;
+    border-radius: 28px;
+    border-width: 5px;
   }
   .mobile-island {
-    width: 60px;
-    height: 14px;
-    top: 12px;
+    width: 55px;
+    height: 12px;
+    top: 10px;
   }
 }
 
 @media only screen and (max-width: 768px) {
   .footer-photo {
-    width: 290px;
-    height: 515px;
+    width: 220px;
+    height: 391px;
   }
   .footer-photo-container {
-    border-radius: 30px;
-    border-width: 5px;
-    margin-bottom: 20px;
+    border-radius: 22px;
+    border-width: 4px;
+    margin-bottom: 15px;
   }
   .mobile-island {
-    width: 50px;
-    height: 12px;
-    top: 10px;
+    width: 45px;
+    height: 10px;
+    top: 8px;
   }
 }

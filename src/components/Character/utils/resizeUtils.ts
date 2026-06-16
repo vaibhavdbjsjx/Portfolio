@@ -10,8 +10,12 @@ export default function handleResize(
 ) {
   if (!canvasDiv.current) return;
   let canvas3d = canvasDiv.current.getBoundingClientRect();
-  const width = canvas3d.width;
-  const height = canvas3d.height;
+  let width = canvas3d.width;
+  let height = canvas3d.height;
+  if (width === 0 || height === 0) {
+    width = canvasDiv.current.clientWidth || window.innerWidth;
+    height = canvasDiv.current.clientHeight || (window.innerWidth <= 768 ? window.innerHeight * 0.5 : window.innerHeight * 0.8);
+  }
   renderer.setSize(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
