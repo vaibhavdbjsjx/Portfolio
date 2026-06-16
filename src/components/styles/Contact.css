@@ -1,7 +1,12 @@
 .contact-section {
   margin: auto;
-  padding-bottom: 100px;
-  margin-top: 100px;
+  padding-top: 80px;
+  padding-bottom: 80px;
+  min-height: var(--vh);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
 }
 .contact-section h3 {
   font-size: 60px;
@@ -12,6 +17,7 @@
 .contact-flex {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 .contact-flex h4 {
   font-weight: 500;
@@ -46,6 +52,7 @@ a.contact-social {
   gap: 10px;
   opacity: 0.5;
 }
+
 @media only screen and (max-width: 1600px) {
   .contact-section h3 {
     font-size: 50px;
@@ -57,6 +64,7 @@ a.contact-social {
     font-size: 22px;
   }
 }
+
 @media only screen and (max-width: 1300px) {
   .contact-section h3 {
     font-size: 40px;
@@ -71,6 +79,7 @@ a.contact-social {
     margin-top: 0px;
   }
 }
+
 @media only screen and (max-width: 900px) {
   .contact-flex {
     flex-direction: column;
@@ -83,10 +92,156 @@ a.contact-social {
     margin-top: 20px;
   }
   .contact-section {
-    margin-top: 50px;
+    padding-top: 50px;
     padding-bottom: 50px;
   }
   .contact-container {
     width: calc(100% - 25px);
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .contact-section {
+    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px;
+    padding-bottom: 60px;
+    min-height: var(--vh);
+  }
+  .contact-section h3 {
+    font-size: clamp(32px, 8vw, 40px);
+    text-align: center;
+  }
+  .contact-flex {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+  }
+  .contact-box {
+    align-items: center;
+    text-align: center;
+  }
+  .contact-flex h4 {
+    margin-top: 10px;
+  }
+  a.contact-social {
+    padding: 12px 20px;
+    display: inline-block;
+    font-size: 20px;
+  }
+  .contact-box h5 {
+    justify-content: center;
+  }
+}
+
+/* Premium Footer Photo Styling - Mobile Phone Frame Layout */
+.footer-photo-box {
+  align-items: center;
+  text-align: center;
+}
+
+.footer-photo-container {
+  position: relative;
+  margin-bottom: 25px;
+  display: inline-block;
+  border-radius: 40px;
+  background-color: #0b080c;
+  padding: 0;
+  /* Premium border styled like smartphone bezel in brand accent color */
+  border: 8px solid var(--accentColor);
+  box-shadow: 
+    0 20px 45px rgba(0, 0, 0, 0.7),
+    0 0 30px var(--accentColor);
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  overflow: hidden;
+}
+
+.footer-photo-container::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  background: radial-gradient(circle, var(--accentColor) 0%, transparent 75%);
+  filter: blur(12px);
+  z-index: -1;
+  border-radius: 44px;
+  opacity: 0.4;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.footer-photo-container:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.85),
+    0 0 45px var(--accentColor);
+}
+
+.footer-photo-container:hover::before {
+  opacity: 0.7;
+}
+
+.mobile-island {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 75px;
+  height: 18px;
+  background-color: #0b080c;
+  border-radius: 20px;
+  z-index: 10;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+:root.light-mode .mobile-island {
+  background-color: #f7f5fa;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.footer-photo {
+  display: block;
+  width: 420px;
+  height: 746px; /* Aspect ratio 9:16 for mobile screen layout */
+  object-fit: cover;
+  border-radius: 32px; /* Curves inside the 40px bezel */
+  opacity: 0.95;
+  transition: border-color 0.4s ease;
+}
+
+@media only screen and (max-width: 1024px) {
+  .footer-photo {
+    width: 340px;
+    height: 604px;
+  }
+  .footer-photo-container {
+    border-radius: 34px;
+    border-width: 6px;
+  }
+  .mobile-island {
+    width: 60px;
+    height: 14px;
+    top: 12px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .footer-photo {
+    width: 290px;
+    height: 515px;
+  }
+  .footer-photo-container {
+    border-radius: 30px;
+    border-width: 5px;
+    margin-bottom: 20px;
+  }
+  .mobile-island {
+    width: 50px;
+    height: 12px;
+    top: 10px;
   }
 }

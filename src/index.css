@@ -7,8 +7,8 @@
   font-style: normal;
   line-height: 1.5;
   scroll-behavior: smooth;
-  color-scheme: light dark;
-  color: #eae5ec;
+  color-scheme: dark;
+  color: var(--textColor);
   background-color: var(--backgroundColor);
 
   font-synthesis: none;
@@ -18,8 +18,40 @@
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
+
   --accentColor: #c2a4ff;
   --backgroundColor: #0b080c;
+  --textColor: #eae5ec;
+  --textDescriptionColor: #a49ea6;
+  --cardBg: rgba(255, 255, 255, 0.05);
+  --cardBorder: rgba(255, 255, 255, 0.15);
+  --timelineColor: rgba(255, 255, 255, 0.15);
+  --dashedBorder: rgba(255, 255, 255, 0.3);
+  --borderColor: #363636;
+  --socialCircleBg: rgba(255, 255, 255, 0.05);
+  --tagBg: rgba(255, 255, 255, 0.15);
+  --tagBorder: rgba(255, 255, 255, 0.3);
+  
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+:root.light-mode {
+  color-scheme: light;
+  --accentColor: #7c4dff;
+  --backgroundColor: #f7f5fa;
+  --textColor: #1c1921;
+  --textDescriptionColor: #5c5660;
+  --cardBg: rgba(0, 0, 0, 0.02);
+  --cardBorder: rgba(0, 0, 0, 0.08);
+  --timelineColor: rgba(0, 0, 0, 0.08);
+  --dashedBorder: rgba(0, 0, 0, 0.15);
+  --borderColor: #dcd6ce;
+  --socialCircleBg: rgba(0, 0, 0, 0.03);
+  --tagBg: rgba(0, 0, 0, 0.05);
+  --tagBorder: rgba(0, 0, 0, 0.12);
+}
+
+:root {
   --vh: 100vh;
   --vh: 100svh;
 }
@@ -58,7 +90,7 @@ main {
 body {
   margin: 0;
   height: auto;
-  background-color: #000;
+  background-color: var(--backgroundColor);
   flex-grow: 1;
   --cWidth: calc(100% - 30px);
   --cMaxWidth: 1920px;
@@ -121,3 +153,26 @@ body {
     font-size: 40px;
   }
 }
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+#smooth-wrapper {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  .techstack h2 {
+    font-size: clamp(32px, 6vw, 40px);
+    top: 50px;
+  }
+  .techstack {
+    margin-top: 30px;
+    margin-bottom: 0px;
+    height: 80vh;
+    min-height: 480px;
+  }
+}
+

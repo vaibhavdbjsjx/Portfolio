@@ -34,7 +34,7 @@
 }
 .what-box-in {
   flex-direction: column;
-  height: 500px;
+  height: 620px; /* Increased from 500px to ensure expanded cards display all content comfortably */
   margin-left: 200px;
   position: relative;
   display: none;
@@ -235,8 +235,8 @@
   font-size: 13px;
   font-weight: 400;
   padding: 2px 7px;
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid #ffffff50;
+  background-color: var(--tagBg);
+  border: 1px solid var(--tagBorder);
   border-radius: 30px;
 }
 @media only screen and (max-width: 1600px) {
@@ -249,7 +249,7 @@
     margin-right: 20%;
   }
   .what-box-in {
-    height: 400px;
+    height: 500px; /* Increased from 400px to ensure card fit */
   }
   .what-content h3 {
     font-size: 28px;
@@ -290,7 +290,7 @@
     padding-bottom: 50px;
   }
   .what-box-in {
-    height: 500px;
+    height: 620px; /* Restored and adjusted */
     margin-left: -50px;
   }
   .what-content {
@@ -326,7 +326,7 @@
     justify-content: left;
   }
   .what-box:last-child {
-    height: 500px;
+    height: 620px; /* Restored and adjusted */
   }
   .what-box {
     width: 500px;
@@ -338,7 +338,7 @@
   }
   .what-box-in {
     margin-left: 0px;
-    height: 450px;
+    height: 560px; /* Restored and adjusted */
   }
   .what-content h5,
   .what-content-flex {
@@ -389,5 +389,34 @@
   .what-box h2 {
     font-size: 7rem;
     line-height: 6.8rem;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .what-border1 svg {
+    width: 100%;
+  }
+  .what-border2 svg {
+    height: 100%;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .what-box {
+    max-width: calc(100% - 20px);
+  }
+  .what-content {
+    padding: 20px;
+  }
+  .what-content h3 {
+    font-size: clamp(20px, 5vw, 24px);
+  }
+  .what-content p {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .what-tags {
+    font-size: 11px;
+    padding: 2px 6px;
   }
 }

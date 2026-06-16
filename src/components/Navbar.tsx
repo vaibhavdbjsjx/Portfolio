@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HoverLinks from "./HoverLinks";
 import { gsap } from "gsap";
@@ -9,6 +9,12 @@ gsap.registerPlugin(ScrollSmoother, ScrollTrigger);
 export let smoother: ScrollSmoother;
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
   useEffect(() => {
     smoother = ScrollSmoother.create({
       wrapper: "#smooth-wrapper",
@@ -27,6 +33,7 @@ const Navbar = () => {
     links.forEach((elem) => {
       let element = elem as HTMLAnchorElement;
       element.addEventListener("click", (e) => {
+        setIsOpen(false);
         if (window.innerWidth > 1024) {
           e.preventDefault();
           let elem = e.currentTarget as HTMLAnchorElement;
@@ -35,24 +42,43 @@ const Navbar = () => {
         }
       });
     });
-    window.addEventListener("resize", () => {
-      ScrollSmoother.refresh(true);
-    });
+    let resizeTimeout: any;
+    const onResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        ScrollSmoother.refresh(true);
+      }, 150);
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      clearTimeout(resizeTimeout);
+    };
   }, []);
   return (
     <>
       <div className="header">
         <a href="/#" className="navbar-title" data-cursor="disable">
-          Logo
+          VSG
         </a>
         <a
-          href="mailto:example@mail.com"
+          href="mailto:Vaibhav.sg18@gmail.com"
           className="navbar-connect"
           data-cursor="disable"
         >
-          example@mail.com
+          Vaibhav.sg18@gmail.com
         </a>
-        <ul>
+        <button
+          className={`hamburger ${isOpen ? "open" : ""}`}
+          onClick={toggleMenu}
+          aria-label="Toggle Navigation Menu"
+          data-cursor="disable"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <ul className={isOpen ? "nav-menu-open" : ""}>
           <li>
             <a data-href="#about" href="#about">
               <HoverLinks text="ABOUT" />

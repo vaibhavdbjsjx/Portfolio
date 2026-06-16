@@ -1,48 +1,80 @@
 import * as THREE from "three";
 import gsap from "gsap";
 
+let activeTl1: gsap.core.Timeline | null = null;
+let activeTl2: gsap.core.Timeline | null = null;
+let activeTl3: gsap.core.Timeline | null = null;
+let activeCareerTimeline: gsap.core.Timeline | null = null;
+let activeCertTimeline: gsap.core.Timeline | null = null;
+let activeIntervalId: any = null;
+
 export function setCharTimeline(
   character: THREE.Object3D<THREE.Object3DEventMap> | null,
   camera: THREE.PerspectiveCamera
 ) {
+  if (activeIntervalId) {
+    clearInterval(activeIntervalId);
+    activeIntervalId = null;
+  }
+  if (activeTl1) {
+    activeTl1.scrollTrigger?.kill();
+    activeTl1.kill();
+    activeTl1 = null;
+  }
+  if (activeTl2) {
+    activeTl2.scrollTrigger?.kill();
+    activeTl2.kill();
+    activeTl2 = null;
+  }
+  if (activeTl3) {
+    activeTl3.scrollTrigger?.kill();
+    activeTl3.kill();
+    activeTl3 = null;
+  }
+
   let intensity: number = 0;
-  setInterval(() => {
+  activeIntervalId = setInterval(() => {
     intensity = Math.random();
   }, 200);
-  const tl1 = gsap.timeline({
+
+  activeTl1 = gsap.timeline({
     scrollTrigger: {
       trigger: ".landing-section",
       start: "top top",
       end: "bottom top",
-      scrub: true,
+      scrub: 1.2,
       invalidateOnRefresh: true,
     },
   });
-  const tl2 = gsap.timeline({
+  activeTl2 = gsap.timeline({
     scrollTrigger: {
       trigger: ".about-section",
-      start: "center 55%",
+      start: "top top",
       end: "bottom top",
-      scrub: true,
+      scrub: 1.2,
       invalidateOnRefresh: true,
     },
   });
-  const tl3 = gsap.timeline({
+  activeTl3 = gsap.timeline({
     scrollTrigger: {
       trigger: ".whatIDO",
       start: "top top",
       end: "bottom top",
-      scrub: true,
+      scrub: 1.2,
       invalidateOnRefresh: true,
     },
   });
+
   let screenLight: any, monitor: any;
+  const furnitureNames = ["Cube002", "Keyboard", "Plane", "ground", "Plane002", "Plane003"];
+  const furnitureNodes: THREE.Object3D[] = [];
+
   character?.children.forEach((object: any) => {
     if (object.name === "Plane004") {
       object.children.forEach((child: any) => {
         child.material.transparent = true;
         child.material.opacity = 0;
-        if (child.material.name === "Material.027") {
+        if (child.material.name === "Material.020") {
           monitor = child;
           child.material.color.set("#FFFFFF");
         }
@@ -59,11 +91,16 @@ export function setCharTimeline(
       });
       screenLight = object;
     }
+    if (furnitureNames.includes(object.name)) {
+      object.visible = false;
+      furnitureNodes.push(object);
+    }
   });
+
   let neckBone = character?.getObjectByName("spine005");
   if (window.innerWidth > 1024) {
     if (character) {
-      tl1
+      activeTl1
         .fromTo(character.rotation, { y: 0 }, { y: 0.7, duration: 1 }, 0)
         .to(camera.position, { z: 22 }, 0)
         .fromTo(".character-model", { x: 0 }, { x: "-25%", duration: 1 }, 0)
@@ -71,7 +108,7 @@ export function setCharTimeline(
         .to(".landing-container", { y: "40%", duration: 0.8 }, 0)
         .fromTo(".about-me", { y: "-50%" }, { y: "0%" }, 0);
 
-      tl2
+      activeTl2
         .to(
           camera.position,
           { z: 75, y: 8.4, duration: 6, delay: 2, ease: "power3.inOut" },
@@ -89,6 +126,7 @@ export function setCharTimeline(
         .to(neckBone!.rotation, { x: 0.6, delay: 2, duration: 3 }, 0)
         .to(monitor.material, { opacity: 1, duration: 0.8, delay: 3.2 }, 0)
         .to(screenLight.material, { opacity: 1, duration: 0.8, delay: 4.5 }, 0)
+        .set(furnitureNodes, { visible: true, immediateRender: false }, 1.5)
         .fromTo(
           ".what-box-in",
           { display: "none" },
@@ -108,7 +146,7 @@ export function setCharTimeline(
           0.3
         );
 
-      tl3
+      activeTl3
         .fromTo(
           ".character-model",
           { y: "0%" },
@@ -116,7 +154,8 @@ export function setCharTimeline(
           0
         )
         .fromTo(".whatIDO", { y: 0 }, { y: "15%", duration: 2 }, 0)
-        .to(character.rotation, { x: -0.04, duration: 2, delay: 1 }, 0);
+        .to(character.rotation, { x: -0.04, duration: 2, delay: 1 }, 0)
+        .set(furnitureNodes, { visible: false, immediateRender: false }, 2);
     }
   } else {
     if (character) {
@@ -132,8 +171,20 @@ export function setCharTimeline(
   }
 }
 
+
 export function setAllTimeline() {
-  const careerTimeline = gsap.timeline({
+  if (activeCareerTimeline) {
+    activeCareerTimeline.scrollTrigger?.kill();
+    activeCareerTimeline.kill();
+    activeCareerTimeline = null;
+  }
+  if (activeCertTimeline) {
+    activeCertTimeline.scrollTrigger?.kill();
+    activeCertTimeline.kill();
+    activeCertTimeline = null;
+  }
+
+  activeCareerTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: ".career-section",
       start: "top 30%",
@@ -142,14 +193,13 @@ export function setAllTimeline() {
       invalidateOnRefresh: true,
     },
   });
-  careerTimeline
+  activeCareerTimeline
     .fromTo(
       ".career-timeline",
       { maxHeight: "10%" },
       { maxHeight: "100%", duration: 0.5 },
       0
     )
-
     .fromTo(
       ".career-timeline",
       { opacity: 0 },
@@ -174,18 +224,67 @@ export function setAllTimeline() {
     );
 
   if (window.innerWidth > 1024) {
-    careerTimeline.fromTo(
+    activeCareerTimeline.fromTo(
       ".career-section",
       { y: 0 },
       { y: "20%", duration: 0.5, delay: 0.2 },
       0
     );
   } else {
-    careerTimeline.fromTo(
+    activeCareerTimeline.fromTo(
       ".career-section",
       { y: 0 },
       { y: 0, duration: 0.5, delay: 0.2 },
       0
     );
+  }
+
+  activeCertTimeline = gsap.timeline({
+    scrollTrigger: {
+      trigger: ".certifications-section",
+      start: "top 80%",
+      end: "center center",
+      scrub: true,
+      invalidateOnRefresh: true,
+    },
+  });
+  activeCertTimeline
+    .fromTo(
+      ".cert-card",
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, stagger: 0.15, duration: 0.5 },
+      0
+    );
+}
+
+export function clearAllTimelines() {
+  if (activeIntervalId) {
+    clearInterval(activeIntervalId);
+    activeIntervalId = null;
+  }
+  if (activeTl1) {
+    activeTl1.scrollTrigger?.kill();
+    activeTl1.kill();
+    activeTl1 = null;
+  }
+  if (activeTl2) {
+    activeTl2.scrollTrigger?.kill();
+    activeTl2.kill();
+    activeTl2 = null;
+  }
+  if (activeTl3) {
+    activeTl3.scrollTrigger?.kill();
+    activeTl3.kill();
+    activeTl3 = null;
+  }
+  if (activeCareerTimeline) {
+    activeCareerTimeline.scrollTrigger?.kill();
+    activeCareerTimeline.kill();
+    activeCareerTimeline = null;
+  }
+  if (activeCertTimeline) {
+    activeCertTimeline.scrollTrigger?.kill();
+    activeCertTimeline.kill();
+    activeCertTimeline = null;
   }
 }

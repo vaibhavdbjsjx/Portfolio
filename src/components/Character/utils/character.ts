@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { DRACOLoader, GLTF, GLTFLoader } from "three-stdlib";
-import { setCharTimeline, setAllTimeline } from "../../utils/GsapScroll";
 import { decryptFile } from "./decrypt";
 
 const setCharacter = (
@@ -27,7 +26,15 @@ const setCharacter = (
           blobUrl,
           async (gltf) => {
             character = gltf.scene;
-            await renderer.compileAsync(character, camera, scene);
+            try {
+              // Wrap compileAsync in a timeout to ensure it never hangs the loading process on mobile
+              await Promise.race([
+                renderer.compileAsync(character, camera, scene),
+                new Promise((resolve) => setTimeout(resolve, 1500))
+              ]);
+            } catch (compileError) {
+              console.warn("compileAsync failed or timed-out, proceeding:", compileError);
+            }
             character.traverse((child: any) => {
               if (child.isMesh) {
                 const mesh = child as THREE.Mesh;
@@ -37,8 +44,6 @@ const setCharacter = (
               }
             });
             resolve(gltf);
-            setCharTimeline(character, camera);
-            setAllTimeline();
             character!.getObjectByName("footR")!.position.y = 3.36;
             character!.getObjectByName("footL")!.position.y = 3.36;
             dracoLoader.dispose();

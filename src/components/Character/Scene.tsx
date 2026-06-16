@@ -12,6 +12,7 @@ import {
 } from "./utils/mouseUtils";
 import setAnimations from "./utils/animationUtils";
 import { setProgress } from "../Loading";
+import { setCharTimeline, setAllTimeline, clearAllTimelines } from "../utils/GsapScroll";
 
 const Scene = () => {
   const canvasDiv = useRef<HTMLDivElement | null>(null);
@@ -19,8 +20,9 @@ const Scene = () => {
   const sceneRef = useRef(new THREE.Scene());
   const { setLoading } = useLoading();
 
-  const [character, setChar] = useState<THREE.Object3D | null>(null);
+  const [, setChar] = useState<THREE.Object3D | null>(null);
   useEffect(() => {
+    let isCancelled = false;
     if (canvasDiv.current) {
       let rect = canvasDiv.current.getBoundingClientRect();
       let container = { width: rect.width, height: rect.height };
@@ -32,7 +34,8 @@ const Scene = () => {
         antialias: true,
       });
       renderer.setSize(container.width, container.height);
-      renderer.setPixelRatio(window.devicePixelRatio);
+      const maxPixelRatio = window.innerWidth <= 768 ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2);
+      renderer.setPixelRatio(maxPixelRatio);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1;
       canvasDiv.current.appendChild(renderer.domElement);
@@ -53,25 +56,40 @@ const Scene = () => {
       let progress = setProgress((value) => setLoading(value));
       const { loadCharacter } = setCharacter(renderer, scene, camera);
 
+      let resizeListener: (() => void) | undefined;
+      let resizeTimeout: any;
+      let animationFrameId: number;
+
       loadCharacter().then((gltf) => {
+        if (isCancelled) return;
         if (gltf) {
           const animations = setAnimations(gltf);
           hoverDivRef.current && animations.hover(gltf, hoverDivRef.current);
           mixer = animations.mixer;
           let character = gltf.scene;
+
+          setCharTimeline(character, camera);
+          setAllTimeline();
+
           setChar(character);
           scene.add(character);
           headBone = character.getObjectByName("spine006") || null;
           screenLight = character.getObjectByName("screenlight") || null;
           progress.loaded().then(() => {
+            if (isCancelled) return;
             setTimeout(() => {
+              if (isCancelled) return;
               light.turnOnLights();
               animations.startIntro();
             }, 2500);
           });
-          window.addEventListener("resize", () =>
-            handleResize(renderer, camera, canvasDiv, character)
-          );
+          resizeListener = () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+              handleResize(renderer, camera, canvasDiv, character);
+            }, 150);
+          };
+          window.addEventListener("resize", resizeListener);
         }
       });
 
@@ -98,16 +116,30 @@ const Scene = () => {
         });
       };
 
-      document.addEventListener("mousemove", (event) => {
-        onMouseMove(event);
-      });
+      document.addEventListener("mousemove", onMouseMove);
       const landingDiv = document.getElementById("landingDiv");
       if (landingDiv) {
         landingDiv.addEventListener("touchstart", onTouchStart);
         landingDiv.addEventListener("touchend", onTouchEnd);
       }
+      let whatIDoSection: Element | null = null;
       const animate = () => {
-        requestAnimationFrame(animate);
+        animationFrameId = requestAnimationFrame(animate);
+        if (canvasDiv.current) {
+          const canvasRect = canvasDiv.current.getBoundingClientRect();
+          if (canvasRect.bottom < 0 || canvasRect.top > window.innerHeight) {
+            return;
+          }
+        }
+        if (!whatIDoSection) {
+          whatIDoSection = document.querySelector(".whatIDO");
+        }
+        if (whatIDoSection) {
+          const rect = whatIDoSection.getBoundingClientRect();
+          if (rect.bottom < 0) {
+            return;
+          }
+        }
         if (headBone) {
           handleHeadRotation(
             headBone,
@@ -127,17 +159,21 @@ const Scene = () => {
       };
       animate();
       return () => {
+        isCancelled = true;
         clearTimeout(debounce);
+        clearTimeout(resizeTimeout);
+        clearAllTimelines();
+        cancelAnimationFrame(animationFrameId);
         scene.clear();
         renderer.dispose();
-        window.removeEventListener("resize", () =>
-          handleResize(renderer, camera, canvasDiv, character!)
-        );
+        if (resizeListener) {
+          window.removeEventListener("resize", resizeListener);
+        }
         if (canvasDiv.current) {
           canvasDiv.current.removeChild(renderer.domElement);
         }
+        document.removeEventListener("mousemove", onMouseMove);
         if (landingDiv) {
-          document.removeEventListener("mousemove", onMouseMove);
           landingDiv.removeEventListener("touchstart", onTouchStart);
           landingDiv.removeEventListener("touchend", onTouchEnd);
         }

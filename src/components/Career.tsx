@@ -15,43 +15,49 @@ const Career = () => {
           <div className="career-info-box">
             <div className="career-info-in">
               <div className="career-role">
-                <h4>Position In Company</h4>
-                <h5>Company Name</h5>
+                <h4>SSLC Education</h4>
+                <h5>Secondary School</h5>
               </div>
-              <h3>20XX</h3>
+              <h3>2020</h3>
             </div>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim
-              labore sit non ipsum temporibus quidem, deserunt eaque officiis
-              mollitia ratione suscipit repellat.
+              Completed secondary education with SSLC score of 89.4%.
             </p>
           </div>
           <div className="career-info-box">
             <div className="career-info-in">
               <div className="career-role">
-                <h4>Position In Company</h4>
-                <h5>Company Name</h5>
+                <h4>PUC Education</h4>
+                <h5>Venkatramana PU College</h5>
               </div>
-              <h3>20XX</h3>
+              <h3>2022</h3>
             </div>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim
-              labore sit non ipsum temporibus quidem, deserunt eaque officiis
-              mollitia ratione suscipit repellat.
+              Completed Pre-University Course (PUC) with a score of 80.6%.
             </p>
           </div>
           <div className="career-info-box">
             <div className="career-info-in">
               <div className="career-role">
-                <h4>Position In Company</h4>
-                <h5>Company Name</h5>
+                <h4>Bachelor of Engineering (CSE)</h4>
+                <h5>Canara Engineering College</h5>
               </div>
-              <h3>NOW</h3>
+              <h3>2026</h3>
             </div>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim
-              labore sit non ipsum temporibus quidem, deserunt eaque officiis
-              mollitia ratione suscipit repellat.
+              Specializing in Computer Science & Engineering, focusing on AI/ML engineering, full-stack web development, and scalable system architectures.
+            </p>
+          </div>
+          <div className="career-info-box">
+            <div className="career-info-in">
+              <div className="career-role">
+                <h4>Android App Development Intern</h4>
+                <h5>MindMatrix Technologies</h5>
+              </div>
+              <h3>2026</h3>
+            </div>
+            <p>
+              Developed native Android applications using Kotlin and Java. Integrated REST APIs, managed offline storage using Room ORM/SQLite, designed responsive UI workflows, and handled asynchronous operations with Kotlin Coroutines.
             </p>
           </div>
         </div>

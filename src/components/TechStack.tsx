@@ -10,17 +10,25 @@ import {
   CylinderCollider,
   RapierRigidBody,
 } from "@react-three/rapier";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const textureLoader = new THREE.TextureLoader();
 const imageUrls = [
   "/images/react2.webp",
-  "/images/next2.webp",
+  "/images/ml.webp",
+  "/images/anti.webp",
+  "/images/python.webp",
+  "/images/html.webp",
+  "/images/mysql.webp",
+  "/images/css.webp",
+  "/images/javascript.webp",
+  "/images/git.webp",
+  "/images/gpt.webp",
+  "/images/aws.webp",
+  "/images/java.webp",
   "/images/node2.webp",
   "/images/express.webp",
-  "/images/mongo.webp",
-  "/images/mysql.webp",
-  "/images/typescript.webp",
-  "/images/javascript.webp",
 ];
 const textures = imageUrls.map((url) => textureLoader.load(url));
 
@@ -126,14 +134,41 @@ function Pointer({ vec = new THREE.Vector3(), isActive }: PointerProps) {
 
 const TechStack = () => {
   const [isActive, setIsActive] = useState(false);
+  const [cameraConfig, setCameraConfig] = useState(() => {
+    const w = window.innerWidth;
+    if (w < 768) return { z: 35, fov: 40 };
+    if (w < 1024) return { z: 25, fov: 32.5 };
+    return { z: 20, fov: 32.5 };
+  });
 
   useEffect(() => {
+    const handleWindowResize = () => {
+      const w = window.innerWidth;
+      if (w < 768) {
+        setCameraConfig({ z: 35, fov: 40 });
+      } else if (w < 1024) {
+        setCameraConfig({ z: 25, fov: 32.5 });
+      } else {
+        setCameraConfig({ z: 20, fov: 32.5 });
+      }
+    };
+    window.addEventListener("resize", handleWindowResize);
+    return () => window.removeEventListener("resize", handleWindowResize);
+  }, []);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.refresh();
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
+
+    const techstackElement = document.querySelector(".techstack");
     const handleScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const threshold = document
-        .getElementById("work")!
-        .getBoundingClientRect().top;
-      setIsActive(scrollY > threshold);
+      if (techstackElement) {
+        const rect = techstackElement.getBoundingClientRect();
+        setIsActive(rect.top < window.innerHeight && rect.bottom > 0);
+      }
     };
     document.querySelectorAll(".header a").forEach((elem) => {
       const element = elem as HTMLAnchorElement;
@@ -149,6 +184,7 @@ const TechStack = () => {
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      clearTimeout(timer);
     };
   }, []);
   const materials = useMemo(() => {
@@ -172,8 +208,9 @@ const TechStack = () => {
 
       <Canvas
         shadows
+        dpr={window.innerWidth <= 768 ? [1, 1.5] : [1, 2]}
         gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
-        camera={{ position: [0, 0, 20], fov: 32.5, near: 1, far: 100 }}
+        camera={{ position: [0, 0, cameraConfig.z], fov: cameraConfig.fov, near: 1, far: 100 }}
         onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}
         className="tech-canvas"
       >
