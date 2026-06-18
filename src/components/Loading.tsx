@@ -27,6 +27,12 @@ const Loading = ({ percent }: { percent: number }) => {
           if (module.initialFX) {
             module.initialFX();
           }
+          // Safely unpause ScrollSmoother after dismissal when it is guaranteed to be initialized
+          import("./Navbar").then((nav) => {
+            if (nav.smoother) {
+              nav.smoother.paused(false);
+            }
+          });
           setIsLoading(false);
         }, 900);
       }
@@ -95,7 +101,9 @@ export default Loading;
 export const setProgress = (setLoading: (value: number) => void) => {
   let currentPercent = 0;
   let targetPercent = 15; // Start at 15% immediately to show initial progress
+  let lastReportedPercent = -1; // Track last reported value to avoid redundant React re-renders
   let animationFrameId: number;
+  let loadedResolve: ((value: number) => void) | null = null;
 
   const update = () => {
     if (currentPercent < targetPercent) {
@@ -104,7 +112,20 @@ export const setProgress = (setLoading: (value: number) => void) => {
       if (currentPercent >= 100) {
         currentPercent = 100;
       }
-      setLoading(Math.round(currentPercent));
+      
+      const rounded = Math.round(currentPercent);
+      if (rounded !== lastReportedPercent) {
+        lastReportedPercent = rounded;
+        setLoading(rounded);
+      }
+    }
+    // Resolve loaded() promise via the animation frame loop to avoid extra setInterval polling
+    if (loadedResolve && currentPercent >= 100) {
+      const resolve = loadedResolve;
+      loadedResolve = null;
+      cancelAnimationFrame(animationFrameId);
+      resolve(100);
+      return;
     }
     animationFrameId = requestAnimationFrame(update);
   };
@@ -121,13 +142,7 @@ export const setProgress = (setLoading: (value: number) => void) => {
   function loaded() {
     return new Promise<number>((resolve) => {
       targetPercent = 100;
-      const checkInterval = setInterval(() => {
-        if (currentPercent >= 100) {
-          clearInterval(checkInterval);
-          cancelAnimationFrame(animationFrameId);
-          resolve(100);
-        }
-      }, 16);
+      loadedResolve = resolve;
     });
   }
 

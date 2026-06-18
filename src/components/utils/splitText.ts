@@ -75,6 +75,7 @@ export default function setSplitText() {
       }
     );
   });
-
-  ScrollTrigger.addEventListener("refresh", () => setSplitText());
+  // NOTE: Do NOT re-register setSplitText on ScrollTrigger "refresh" events.
+  // That caused infinite recursion: setSplitText → new ScrollTriggers → refresh → setSplitText → ...
+  // Resize handling is done explicitly via the window resize listener in MainContainer.tsx.
 }

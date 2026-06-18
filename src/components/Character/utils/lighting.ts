@@ -18,14 +18,39 @@ const setLighting = (scene: THREE.Scene) => {
   pointLight.castShadow = true;
   scene.add(pointLight);
 
-  new RGBELoader()
-    .setPath("/models/")
-    .load("char_enviorment.hdr", function (texture) {
-      texture.mapping = THREE.EquirectangularReflectionMapping;
-      scene.environment = texture;
-      scene.environmentIntensity = 0;
-      scene.environmentRotation.set(5.76, 85.85, 1);
-    });
+  const hdrReady = new Promise<void>((resolve) => {
+    console.time("HDR Load");
+    new RGBELoader()
+      .setPath("/models/")
+      .load(
+        "char_enviorment.hdr",
+        function (texture) {
+          texture.mapping = THREE.EquirectangularReflectionMapping;
+          scene.environment = texture;
+          scene.environmentIntensity = 0;
+          scene.environmentRotation.set(5.76, 85.85, 1);
+          try {
+            console.timeEnd("HDR Load");
+          } catch (e) {}
+          resolve();
+        },
+        undefined,
+        () => {
+          console.warn("HDR environment failed to load, proceeding without it.");
+          try {
+            console.timeEnd("HDR Load");
+          } catch (e) {}
+          resolve(); // Don't block loading if HDR fails
+        }
+      );
+    // Fallback: if HDR takes more than 8 seconds, proceed without it
+    setTimeout(() => {
+      try {
+        console.timeEnd("HDR Load");
+      } catch (e) {}
+      resolve();
+    }, 8000);
+  });
 
   function setPointLight(screenLight: any) {
     if (screenLight && screenLight.material && screenLight.material.opacity > 0.9) {
@@ -55,7 +80,7 @@ const setLighting = (scene: THREE.Scene) => {
     });
   }
 
-  return { setPointLight, turnOnLights };
+  return { setPointLight, turnOnLights, hdrReady };
 };
 
 export default setLighting;

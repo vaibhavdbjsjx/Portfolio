@@ -13,6 +13,7 @@ const setAnimations = (gltf: GLTF) => {
     introAction.setLoop(THREE.LoopOnce, 1);
     introAction.clampWhenFinished = true;
     introAction.play();
+    introAction.paused = true; // Pause on first frame (sleeping state) during loading
     const clipNames = ["key1", "key2", "key5", "key6"];
     clipNames.forEach((name) => {
       const clip = THREE.AnimationClip.findByName(gltf.animations, name);
@@ -38,6 +39,7 @@ const setAnimations = (gltf: GLTF) => {
     );
     const introAction = mixer.clipAction(introClip!);
     introAction.clampWhenFinished = true;
+    introAction.paused = false; // Unpause the action
     introAction.reset().play();
     setTimeout(() => {
       const blink = gltf.animations.find((clip) => clip.name === "Blink");
