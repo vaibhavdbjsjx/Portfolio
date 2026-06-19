@@ -34,6 +34,11 @@ const Loading = ({ percent }: { percent: number }) => {
             }
           });
           setIsLoading(false);
+          setTimeout(() => {
+            import("gsap/ScrollTrigger").then((gsapTrigger) => {
+              gsapTrigger.ScrollTrigger.refresh();
+            });
+          }, 150);
         }, 900);
       }
     });
