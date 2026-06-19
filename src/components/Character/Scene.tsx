@@ -113,9 +113,6 @@ const Scene = () => {
           mixer = animations.mixer;
           let character = gltf.scene;
 
-          setCharTimeline(character, camera);
-          setAllTimeline();
-
           setChar(character);
           scene.add(character);
           headBone = character.getObjectByName("spine006") || null;
@@ -124,8 +121,16 @@ const Scene = () => {
             if (isCancelled) return;
             setTimeout(() => {
               if (isCancelled) return;
-              light.turnOnLights();
-              animations.startIntro();
+              // Ensure we compile timelines after loading screen is completely unmounted and layout has settled
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  if (isCancelled) return;
+                  setCharTimeline(character, camera);
+                  setAllTimeline();
+                  light.turnOnLights();
+                  animations.startIntro();
+                });
+              });
             }, 2500);
           });
           resizeListener = () => {
