@@ -16,20 +16,36 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    if (window.innerWidth > 1024) {
-      smoother = ScrollSmoother.create({
-        wrapper: "#smooth-wrapper",
-        content: "#smooth-content",
-        smooth: 1.7,
-        speed: 1.7,
-        effects: true,
-        autoResize: true,
-        ignoreMobileResize: true,
-      });
+    const initSmoother = () => {
+      const isDesktop = window.innerWidth > 1024;
+      if (isDesktop) {
+        if (!smoother) {
+          smoother = ScrollSmoother.create({
+            wrapper: "#smooth-wrapper",
+            content: "#smooth-content",
+            smooth: 1.7,
+            speed: 1.7,
+            effects: true,
+            autoResize: true,
+            ignoreMobileResize: true,
+          });
 
-      smoother.scrollTop(0);
-      smoother.paused(true);
-    }
+          smoother.scrollTop(0);
+          const isLoadingScreenActive = !!document.querySelector(".loading-screen");
+          if (isLoadingScreenActive) {
+            smoother.paused(true);
+          }
+        }
+      } else {
+        if (smoother) {
+          smoother.kill();
+          smoother = undefined as any;
+          ScrollTrigger.refresh();
+        }
+      }
+    };
+
+    initSmoother();
 
     let links = document.querySelectorAll(".header ul a");
     links.forEach((elem) => {
@@ -50,7 +66,8 @@ const Navbar = () => {
     const onResize = () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        if (window.innerWidth > 1024) {
+        initSmoother();
+        if (smoother) {
           ScrollSmoother.refresh(true);
         }
       }, 150);
@@ -59,6 +76,11 @@ const Navbar = () => {
     return () => {
       window.removeEventListener("resize", onResize);
       clearTimeout(resizeTimeout);
+      if (smoother) {
+        smoother.kill();
+        smoother = undefined as any;
+        ScrollTrigger.refresh();
+      }
     };
   }, []);
   return (
