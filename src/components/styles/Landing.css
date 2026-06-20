@@ -439,10 +439,8 @@ h2.landing-info-h2 {
 }
 
 @media screen and (max-width: 1024px) {
-  .character-model canvas {
-    width: 100% !important;
-    max-width: 100%;
-    height: auto !important;
+  .character-container {
+    width: 100%;
   }
 }
 
