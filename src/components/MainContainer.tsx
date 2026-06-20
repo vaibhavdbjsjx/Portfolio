@@ -14,42 +14,36 @@ import setSplitText from "./utils/splitText";
 const TechStack = lazy(() => import("./TechStack"));
 
 const MainContainer = ({ children }: PropsWithChildren) => {
-  const [isDesktopView, setIsDesktopView] = useState<boolean | null>(null);
+  const [isDesktopView, setIsDesktopView] = useState<boolean>(
+    window.innerWidth > 1024
+  );
 
   console.log(`[MainContainer Render] innerWidth=${window.innerWidth} outerWidth=${window.outerWidth} screen.width=${window.screen.width} devicePixelRatio=${window.devicePixelRatio} isDesktopView=${isDesktopView}`);
 
   useEffect(() => {
-    let resizeTimeout: any;
     const resizeHandler = () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        setSplitText();
-        const nextVal = window.innerWidth > 1024;
-        setIsDesktopView(nextVal);
-      }, 200);
+      setSplitText();
+      const nextVal = window.innerWidth > 1024;
+      console.log(`[MainContainer] calling setIsDesktopView(${nextVal}) innerWidth=${window.innerWidth} screenWidth=${window.screen.width}`);
+      setIsDesktopView(nextVal);
     };
-
-    // Set initial value immediately without debounce on first mount
-    const initialVal = window.innerWidth > 1024;
-    setIsDesktopView(initialVal);
-
+    resizeHandler();
     window.addEventListener("resize", resizeHandler);
     return () => {
       window.removeEventListener("resize", resizeHandler);
-      clearTimeout(resizeTimeout);
     };
-  }, []);
+  }, [isDesktopView]);
 
   return (
     <div className="container-main">
       <Cursor />
       <Navbar />
       <SocialIcons />
-      {isDesktopView === true && children}
+      {isDesktopView && children}
       <div id="smooth-wrapper">
         <div id="smooth-content">
           <div className="container-main">
-            <Landing>{isDesktopView === false && children}</Landing>
+            <Landing>{!isDesktopView && children}</Landing>
             <About />
             <WhatIDo />
             <Career />

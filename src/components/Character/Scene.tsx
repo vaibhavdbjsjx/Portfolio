@@ -126,6 +126,8 @@ const Scene = () => {
           scene.add(character);
           headBone = character.getObjectByName("spine006") || null;
           screenLight = character.getObjectByName("screenlight") || null;
+
+          handleResize(renderer, camera, canvasDiv, character);
           progress.loaded().then(() => {
             if (isCancelled) return;
             setTimeout(() => {
