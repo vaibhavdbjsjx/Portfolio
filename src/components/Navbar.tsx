@@ -29,6 +29,7 @@ const Navbar = () => {
             autoResize: true,
             ignoreMobileResize: true,
           });
+          console.log("[ScrollSmoother] created");
 
           smoother.scrollTop(0);
           const isLoadingScreenActive = !!document.querySelector(".loading-screen");
@@ -41,6 +42,7 @@ const Navbar = () => {
           smoother.kill();
           smoother = undefined as any;
           ScrollTrigger.refresh();
+          console.log("[ScrollSmoother] destroyed");
         }
       }
     };
@@ -80,6 +82,7 @@ const Navbar = () => {
         smoother.kill();
         smoother = undefined as any;
         ScrollTrigger.refresh();
+        console.log("[ScrollSmoother] destroyed");
       }
     };
   }, []);

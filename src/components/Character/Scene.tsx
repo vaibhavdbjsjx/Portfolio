@@ -25,6 +25,11 @@ const Scene = () => {
     let isCancelled = false;
     if (canvasDiv.current) {
       let rect = canvasDiv.current.getBoundingClientRect();
+      let parentRect = canvasDiv.current.parentElement?.getBoundingClientRect();
+      console.log("[Scene] getBoundingClientRect", rect);
+      console.log(`[Scene] parentWidth=${parentRect?.width} parentHeight=${parentRect?.height}`);
+      console.log(`[Scene] window.innerWidth=${window.innerWidth}`);
+
       let width = rect.width;
       let height = rect.height;
       if (width === 0 || height === 0) {
@@ -49,6 +54,9 @@ const Scene = () => {
       }
 
       renderer.setSize(width, height);
+      console.log(`[Scene] width=${width}`);
+      console.log(`[Scene] height=${height}`);
+      console.log(`[Scene] cameraAspect=${aspect}`);
       const maxPixelRatio = window.innerWidth <= 768 ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2);
       renderer.setPixelRatio(maxPixelRatio);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -60,6 +68,7 @@ const Scene = () => {
       camera.position.set(0, 13.1, 24.7);
       camera.zoom = 1.1;
       camera.updateProjectionMatrix();
+      console.log(`[Scene] camera aspect ratio set: ${camera.aspect} zoom=${camera.zoom} cameraPositionX=${camera.position.x}`);
 
       let headBone: THREE.Object3D | null = null;
       let screenLight: any | null = null;
