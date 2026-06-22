@@ -3,26 +3,21 @@ import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (id.includes("three") || id.includes("three-stdlib")) {
-              return "three-vendor";
-            }
-            if (
-              id.includes("@react-three") ||
-              id.includes("rapier") ||
-              id.includes("@dimforge/rapier")
-            ) {
-              return "rapier-vendor";
-            }
-            return "vendor";
+  plugins: [
+    react(),
+    {
+      name: "disable-enc-compression",
+      configurePreviewServer(server) {
+        server.middlewares.use((req: any, res: any, next: any) => {
+          if (req.url && req.url.endsWith(".enc")) {
+            res.setHeader("Content-Encoding", "identity");
           }
-        }
-      }
-    }
-  }
+          next();
+        });
+      },
+
+    },
+  ],
 });
+
+
