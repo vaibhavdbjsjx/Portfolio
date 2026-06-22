@@ -30,7 +30,7 @@ const Contact = () => {
           <div className="contact-box footer-photo-box">
             <div className="footer-photo-container">
               <div className="mobile-island"></div>
-              <img src="/images/vaibhav.jpg" alt="Vaibhav S G" className="footer-photo" />
+              <img src="/images/vaibhav.webp" alt="Vaibhav S G" className="footer-photo" />
             </div>
             <h2>
               Designed and Developed <br /> by <span>Vaibhav S G</span>

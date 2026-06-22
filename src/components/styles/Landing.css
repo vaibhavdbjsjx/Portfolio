@@ -306,7 +306,7 @@ h2.landing-info-h2 {
   .landing-intro {
     top: 50%;
     left: auto;
-    right: 66%;
+    right: calc(50% + 240px);
     transform: translate(0%, -50%);
   }
 
@@ -317,14 +317,14 @@ h2.landing-info-h2 {
     text-align: left;
     transform: translate(0%, -50%);
     right: auto;
-    left: 66%;
+    left: calc(50% + 180px);
   }
 }
 @media screen and (min-width: 1200px) {
   .landing-intro {
     top: 50%;
     left: auto;
-    right: 70%;
+    right: calc(50% + 280px);
     transform: translate(0%, -50%);
   }
 
@@ -335,7 +335,7 @@ h2.landing-info-h2 {
     text-align: left;
     transform: translate(0%, -50%);
     right: auto;
-    left: 70%;
+    left: calc(50% + 220px);
   }
 }
 @media screen and (min-width: 1600px) {

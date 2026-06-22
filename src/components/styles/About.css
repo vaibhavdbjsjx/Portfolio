@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
 .about-section {
   display: flex;
   align-items: center;
@@ -8,29 +10,25 @@
   height: auto;
   width: var(--cWidth);
   margin: auto;
-  overflow: hidden; /* Clips elements translated up into the Hero section */
+  font-family: "Inter", sans-serif;
 }
 
-/* Glassmorphism Card Style for About Me Container */
+/* Strip cards and glassmorphism styles from the main text block container */
 .about-me {
-  background: rgba(16, 12, 22, 0.92);
-  border: none; /* Removed border */
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.5),
-    0 0 25px rgba(194, 164, 255, 0.08);
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
   width: 540px;
   max-width: calc(100% - 15px);
   box-sizing: border-box;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: none;
 }
 
 .about-me:hover {
-  box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.6),
-    0 0 35px rgba(194, 164, 255, 0.15);
-  border-color: rgba(194, 164, 255, 0.25);
+  box-shadow: none;
+  border-color: transparent;
 }
 
 .about-me h3 {
@@ -38,9 +36,10 @@
   text-transform: uppercase;
   letter-spacing: 5px;
   font-weight: 500;
-  color: var(--accentColor);
+  color: #ffffff;
   margin-top: 0;
   margin-bottom: 25px;
+  font-family: "Inter", sans-serif;
 }
 
 /* About content paragraphs */
@@ -50,35 +49,43 @@
   gap: 18px;
 }
 
+/* Liquid ripple filter target container */
+.ripple-text {
+  filter: url(#liquid-ripple-filter);
+  will-change: filter;
+  transform: translateZ(0);
+}
+
 .about-me p.para {
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
   letter-spacing: 0.3px;
-  color: #d8c7ff; /* Elegant light purple text color range requested */
+  color: #ffffff;
   margin: 0;
+  font-family: "Inter", sans-serif;
 }
 
-/* Accent paragraph highlighting the AI capability */
+/* Accent paragraph - stripped colored outlines and border highlights */
 .about-me p.accent-text {
-  color: var(--accentColor);
+  color: #ffffff;
   font-weight: 500;
-  border-left: 3px solid var(--accentColor);
-  padding-left: 15px;
+  border-left: none;
+  padding-left: 0;
   margin: 8px 0;
 }
 
 /* Mindset section styling */
 .mindset-section {
   margin-top: 20px;
-  border-top: 1px solid rgba(194, 164, 255, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 20px;
 }
 
 .mindset-title {
   font-size: 16px;
   font-weight: 500;
-  color: #d8c7ff;
+  color: #ffffff;
   margin: 0 0 12px 0;
   letter-spacing: 0.5px;
 }
@@ -97,14 +104,15 @@
   padding-left: 20px;
   font-size: 15px;
   font-weight: 600;
-  color: var(--accentColor);
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
 }
 
 .mindset-list li::before {
   content: "✦";
   position: absolute;
   left: 0;
-  color: var(--accentColor);
+  color: #ffffff;
   font-size: 12px;
   top: 1px;
 }
@@ -132,7 +140,7 @@
     opacity: 1;
   }
   .about-me {
-    padding: 40px;
+    padding: 0;
     width: 520px;
     max-width: 50%;
   }
@@ -155,7 +163,7 @@
   .about-me {
     width: 100%;
     max-width: calc(100% - 30px);
-    padding: 30px 24px;
+    padding: 0;
     margin: 0 auto;
   }
   .about-me p.para {

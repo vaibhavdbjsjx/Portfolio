@@ -11,19 +11,19 @@ const projects = [
     title: "HiringBuddy",
     category: "AI Recruitment Platform",
     tech: "Python, FastAPI, React, AI",
-    image: "/images/hiringbuddy.jpg",
+    image: "/images/hiringbuddy.webp",
   },
   {
     title: "ML DeepShield",
     category: "AI Security & Threat Detection",
     tech: "Machine Learning, Python, AI, Cybersecurity",
-    image: "/images/deepshield.jpg",
+    image: "/images/deepshield.webp",
   },
   {
     title: "IPL Match Prediction",
     category: "Analytics System",
     tech: "Machine Learning, Python, Analytics",
-    image: "/images/ipl_prediction.jpg",
+    image: "/images/ipl_prediction.webp",
   },
   {
     title: "Solar Monitor",
@@ -31,7 +31,7 @@ const projects = [
     tech: "Flutter, Dart, Hive, AI",
     description:
       "Cross-platform solar monitoring application with predictive analytics, energy consumption tracking, and intelligent power-saving recommendations.",
-    image: "/images/surya_shakti.jpg",
+    image: "/images/surya_shakti.webp",
   },
 ];
 

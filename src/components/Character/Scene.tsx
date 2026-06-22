@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import setCharacter from "./utils/character";
 import setLighting from "./utils/lighting";
 import { useLoading } from "../../context/LoadingProvider";
@@ -73,6 +74,8 @@ const Scene = () => {
       let headBone: THREE.Object3D | null = null;
       let screenLight: any | null = null;
       let mixer: THREE.AnimationMixer;
+      let activeCharacter: THREE.Object3D | null = null;
+      let modelCenter: THREE.Vector3 | null = null;
 
       const clock = new THREE.Clock();
 
@@ -87,6 +90,7 @@ const Scene = () => {
       let animationFrameId: number;
 
       let isLandingVisible = true;
+      let isAboutVisible = false;
       let isWhatIDoVisible = false;
 
       const observer = new IntersectionObserver(
@@ -94,6 +98,8 @@ const Scene = () => {
           entries.forEach((entry) => {
             if (entry.target.id === "landingDiv") {
               isLandingVisible = entry.isIntersecting;
+            } else if (entry.target.classList.contains("about-section")) {
+              isAboutVisible = entry.isIntersecting;
             } else if (entry.target.classList.contains("whatIDO")) {
               isWhatIDoVisible = entry.isIntersecting;
             }
@@ -104,6 +110,8 @@ const Scene = () => {
 
       const landingDiv = document.getElementById("landingDiv");
       if (landingDiv) observer.observe(landingDiv);
+      const aboutElement = document.querySelector(".about-section");
+      if (aboutElement) observer.observe(aboutElement);
       const whatIDoElement = document.querySelector(".whatIDO");
       if (whatIDoElement) observer.observe(whatIDoElement);
 
@@ -121,23 +129,154 @@ const Scene = () => {
           hoverDivRef.current && animations.hover(gltf, hoverDivRef.current);
           mixer = animations.mixer;
           let character = gltf.scene;
+          (window as any).debugCamera = camera;
+          (window as any).debugCharacter = character;
 
           setChar(character);
           scene.add(character);
-          headBone = character.getObjectByName("spine006") || null;
+
+
+          headBone = character.getObjectByName("spine.006") || character.getObjectByName("spine006") || null;
           screenLight = character.getObjectByName("screenlight") || null;
 
+          const tempBox = new THREE.Box3().setFromObject(character);
+          const tempCenter = new THREE.Vector3();
+          tempBox.getCenter(tempCenter);
+          const tempSize = new THREE.Vector3();
+          tempBox.getSize(tempSize);
+          console.log("CENTER X:", tempCenter.x, "Y:", tempCenter.y, "Z:", tempCenter.z);
+
+          console.log("camera.position X:", camera.position.x, "Y:", camera.position.y, "Z:", camera.position.z);
+          console.log("camera.rotation X:", camera.rotation.x, "Y:", camera.rotation.y, "Z:", camera.rotation.z);
+
+          activeCharacter = character;
+          modelCenter = tempCenter;
+
+          const option = typeof (window as any).CENTER_TEST_OPTION === "number" ? (window as any).CENTER_TEST_OPTION : 7;
+          console.log("CENTER_TEST_OPTION applied on load:", option);
+          if (option === 4) {
+            camera.lookAt(tempCenter);
+          } else if (option === 5) {
+            character.position.x = -tempCenter.x;
+          } else if (option === 6) {
+            camera.position.x = tempCenter.x;
+          } else if (option === 7) {
+            character.position.x = -0.3;
+          } else if (option === 8) {
+            character.position.x = -0.5;
+          }
+
+          console.log("[FORENSIC] --- START ---");
+          console.log("CAMERA POSITION", camera.position);
+          const camDir = new THREE.Vector3();
+          camera.getWorldDirection(camDir);
+          console.log("CAMERA DIRECTION", camDir);
+          console.log("CAMERA ROTATION", camera.rotation);
+          console.log("CAMERA QUATERNION", camera.quaternion);
+          console.log("CAMERA ZOOM", camera.zoom);
+
+          const charRootWorld = new THREE.Vector3();
+          character.getWorldPosition(charRootWorld);
+          console.log("CHARACTER ROOT WORLD", charRootWorld);
+
+          const headBoneWorld = new THREE.Vector3();
+          if (headBone) {
+            headBone.getWorldPosition(headBoneWorld);
+          }
+          console.log("HEADBONE WORLD", headBoneWorld);
+
+          const screenLightWorld = new THREE.Vector3();
+          if (screenLight) {
+            screenLight.getWorldPosition(screenLightWorld);
+          }
+          console.log("SCREENLIGHT WORLD", screenLightWorld);
+
+          let monitorMesh: THREE.Object3D | null = null;
+          let deskMesh: THREE.Object3D | null = null;
+
+          character.traverse((child: any) => {
+            if (child.isMesh) {
+              console.log(`[FORENSIC Mesh] name="${child.name}" parent="${child.parent?.name}" pos=(${child.position.x}, ${child.position.y}, ${child.position.z})`);
+              if (child.name === "screenlight") {
+                // screenlight
+              } else if (child.parent && child.parent.name === "Plane004" && child.material && child.material.name === "Material.020") {
+                monitorMesh = child;
+              } else if (child.name.toLowerCase().includes("monitor")) {
+                monitorMesh = child;
+              }
+              if (child.name === "Cube002" || child.name.toLowerCase().includes("desk") || child.name.toLowerCase().includes("table")) {
+                deskMesh = child;
+              }
+            }
+          });
+
+          if (monitorMesh) {
+            const monitorWorld = new THREE.Vector3();
+            (monitorMesh as THREE.Object3D).getWorldPosition(monitorWorld);
+            console.log("MONITOR WORLD", monitorWorld);
+          } else {
+            console.log("MONITOR WORLD NOT FOUND");
+          }
+
+          if (deskMesh) {
+            const deskWorld = new THREE.Vector3();
+            (deskMesh as THREE.Object3D).getWorldPosition(deskWorld);
+            console.log("DESK WORLD", deskWorld);
+          } else {
+            console.log("DESK WORLD NOT FOUND");
+          }
+
+          character.traverse((child: any) => {
+            if (child.isMesh) {
+              const bbox = new THREE.Box3().setFromObject(child);
+              const bCenter = new THREE.Vector3();
+              bbox.getCenter(bCenter);
+              console.log(`[FORENSIC BBox] name="${child.name}" center=(${bCenter.x}, ${bCenter.y}, ${bCenter.z}) size=(${bbox.max.x - bbox.min.x}, ${bbox.max.y - bbox.min.y}, ${bbox.max.z - bbox.min.z})`);
+            }
+          });
+
+          const box = new THREE.Box3().setFromObject(character);
+          const center = new THREE.Vector3();
+          box.getCenter(center);
+          console.log("BOUNDING BOX CENTER", center);
+          console.log("BOUNDING BOX", box);
+          console.log("[FORENSIC] --- END ---");
+
           handleResize(renderer, camera, canvasDiv, character);
+          console.log("[FINAL RESIZE CHECK] after load:", {
+            width: renderer.domElement.clientWidth,
+            height: renderer.domElement.clientHeight,
+            aspect: camera.aspect,
+            canvasWidth: renderer.domElement.style.width,
+            canvasHeight: renderer.domElement.style.height
+          });
           progress.loaded().then(() => {
             if (isCancelled) return;
+            handleResize(renderer, camera, canvasDiv, character);
+            console.log("[FINAL RESIZE CHECK] after progress.loaded:", {
+              width: renderer.domElement.clientWidth,
+              height: renderer.domElement.clientHeight,
+              aspect: camera.aspect,
+              canvasWidth: renderer.domElement.style.width,
+              canvasHeight: renderer.domElement.style.height
+            });
             setTimeout(() => {
               if (isCancelled) return;
               // Ensure we compile timelines after loading screen is completely unmounted and layout has settled
               requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                   if (isCancelled) return;
+                  handleResize(renderer, camera, canvasDiv, character);
+                  console.log("[FINAL RESIZE CHECK] before timelines:", {
+                    width: renderer.domElement.clientWidth,
+                    height: renderer.domElement.clientHeight,
+                    aspect: camera.aspect,
+                    canvasWidth: renderer.domElement.style.width,
+                    canvasHeight: renderer.domElement.style.height
+                  });
                   setCharTimeline(character, camera);
                   setAllTimeline();
+                  ScrollTrigger.refresh();
                   light.turnOnLights();
                   animations.startIntro();
                 });
@@ -190,10 +329,24 @@ const Scene = () => {
       }
       const animate = () => {
         animationFrameId = requestAnimationFrame(animate);
-        const isVisible = isLandingVisible || isWhatIDoVisible;
+        const isVisible = isLandingVisible || isAboutVisible || isWhatIDoVisible;
         if (!isVisible) {
           return;
         }
+
+        const opt = typeof (window as any).CENTER_TEST_OPTION === "number" ? (window as any).CENTER_TEST_OPTION : 7;
+        if (opt === 4 && modelCenter) {
+          camera.lookAt(modelCenter);
+        } else if (opt === 5 && activeCharacter && modelCenter) {
+          activeCharacter.position.x = -modelCenter.x;
+        } else if (opt === 6 && modelCenter) {
+          camera.position.x = modelCenter.x;
+        } else if (opt === 7 && activeCharacter) {
+          activeCharacter.position.x = -0.3;
+        } else if (opt === 8 && activeCharacter) {
+          activeCharacter.position.x = -0.5;
+        }
+
         if (headBone) {
           handleHeadRotation(
             headBone,

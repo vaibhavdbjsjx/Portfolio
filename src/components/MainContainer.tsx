@@ -1,4 +1,4 @@
-import { lazy, PropsWithChildren, Suspense, useEffect, useState } from "react";
+import { lazy, PropsWithChildren, Suspense, useEffect, useRef, useState } from "react";
 import About from "./About";
 import Career from "./Career";
 import Certifications from "./Certifications";
@@ -12,6 +12,35 @@ import Work from "./Work";
 import setSplitText from "./utils/splitText";
 
 const TechStack = lazy(() => import("./TechStack"));
+
+const TechStackLazy = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} style={{ minHeight: "500px" }}>
+      {isVisible && (
+        <Suspense fallback={<div>Loading....</div>}>
+          <TechStack />
+        </Suspense>
+      )}
+    </div>
+  );
+};
 
 const MainContainer = ({ children }: PropsWithChildren) => {
   const [isDesktopView, setIsDesktopView] = useState<boolean>(
@@ -48,9 +77,7 @@ const MainContainer = ({ children }: PropsWithChildren) => {
             <WhatIDo />
             <Career />
             <Work />
-            <Suspense fallback={<div>Loading....</div>}>
-              <TechStack />
-            </Suspense>
+            <TechStackLazy />
             <Certifications />
             <Contact />
           </div>

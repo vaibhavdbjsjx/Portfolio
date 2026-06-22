@@ -292,6 +292,7 @@
   .what-box-in {
     height: 620px; /* Restored and adjusted */
     margin-left: -50px;
+    display: flex !important;
   }
   .what-content {
     padding: 50px;
