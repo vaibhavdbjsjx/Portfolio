@@ -13,7 +13,6 @@
   font-family: "Inter", sans-serif;
 }
 
-/* Strip cards and glassmorphism styles from the main text block container */
 .about-me {
   background: none;
   border: none;
@@ -42,18 +41,24 @@
   font-family: "Inter", sans-serif;
 }
 
-/* About content paragraphs */
 .about-content {
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-/* Liquid ripple filter target container */
+/* Ripple effect only on desktop - on mobile it causes purple glow artifact */
 .ripple-text {
   filter: url(#liquid-ripple-filter);
   will-change: filter;
   transform: translateZ(0);
+}
+
+@media only screen and (max-width: 899px) {
+  .ripple-text {
+    filter: none;
+    will-change: auto;
+  }
 }
 
 .about-me p.para {
@@ -66,7 +71,6 @@
   font-family: "Inter", sans-serif;
 }
 
-/* Accent paragraph - stripped colored outlines and border highlights */
 .about-me p.accent-text {
   color: #ffffff;
   font-weight: 500;
@@ -75,7 +79,6 @@
   margin: 8px 0;
 }
 
-/* Mindset section styling */
 .mindset-section {
   margin-top: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -139,6 +142,7 @@
     padding: 0px;
     opacity: 1;
   }
+
   .about-me {
     padding: 0;
     width: 520px;
@@ -160,17 +164,20 @@
     padding: 80px 0px;
     height: auto;
   }
+
   .about-me {
     width: 100%;
     max-width: calc(100% - 30px);
     padding: 0;
     margin: 0 auto;
   }
+
   .about-me p.para {
     font-size: 15px;
     line-height: 1.55;
     text-align: left;
   }
+
   .mindset-list {
     grid-template-columns: 1fr;
     gap: 8px;

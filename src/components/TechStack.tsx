@@ -135,18 +135,20 @@ function Pointer({ vec = new THREE.Vector3(), isActive }: PointerProps) {
 const TechStack = () => {
   const [isActive, setIsActive] = useState(false);
   const [cameraConfig, setCameraConfig] = useState(() => {
-    const w = window.innerWidth;
-    if (w < 768) return { z: 35, fov: 40 };
-    if (w < 1024) return { z: 25, fov: 32.5 };
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const isTablet = window.matchMedia("(max-width: 1023px)").matches;
+    if (isMobile) return { z: 18, fov: 55 };
+    if (isTablet) return { z: 25, fov: 32.5 };
     return { z: 20, fov: 32.5 };
   });
 
   useEffect(() => {
     const handleWindowResize = () => {
-      const w = window.innerWidth;
-      if (w < 768) {
-        setCameraConfig({ z: 35, fov: 40 });
-      } else if (w < 1024) {
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      const isTablet = window.matchMedia("(max-width: 1023px)").matches;
+      if (isMobile) {
+        setCameraConfig({ z: 18, fov: 55 });
+      } else if (isTablet) {
         setCameraConfig({ z: 25, fov: 32.5 });
       } else {
         setCameraConfig({ z: 20, fov: 32.5 });
@@ -182,6 +184,7 @@ const TechStack = () => {
       clearTimeout(timer);
     };
   }, []);
+
   const materials = useMemo(() => {
     return textures.map(
       (texture) =>
@@ -204,7 +207,7 @@ const TechStack = () => {
       <Canvas
         shadows
         frameloop={isActive ? "always" : "never"}
-        dpr={window.innerWidth <= 768 ? [1, 1.5] : [1, 2]}
+        dpr={window.matchMedia("(max-width: 767px)").matches ? [1, 1.5] : [1, 2]}
         gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
         camera={{ position: [0, 0, cameraConfig.z], fov: cameraConfig.fov, near: 1, far: 100 }}
         onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}

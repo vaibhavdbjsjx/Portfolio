@@ -31,7 +31,7 @@
   --socialCircleBg: rgba(255, 255, 255, 0.05);
   --tagBg: rgba(255, 255, 255, 0.15);
   --tagBorder: rgba(255, 255, 255, 0.3);
-  
+
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -55,6 +55,7 @@
   --vh: 100vh;
   --vh: 100svh;
 }
+
 h1,
 h2,
 h3,
@@ -63,30 +64,37 @@ h5,
 h6 {
   font-family: "Geist", sans-serif;
 }
+
 body {
   overflow: hidden;
 }
+
 a {
   color: inherit;
   text-decoration: inherit;
 }
+
 a:hover {
   color: var(--accentColor);
 }
+
 main {
   opacity: 1;
   transition: 0.3s;
 }
+
 .main-active {
   opacity: 0;
   animation: fadeIn 1s 1;
   animation-fill-mode: forwards;
 }
+
 @keyframes fadeIn {
   100% {
     opacity: 1;
   }
 }
+
 body {
   margin: 0;
   height: auto;
@@ -97,6 +105,7 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
 }
+
 .main-body {
   max-width: 100vw;
   overflow-x: hidden;
@@ -107,15 +116,18 @@ body {
   margin: auto;
   position: relative;
 }
+
 .container1 {
   width: var(--cWidth);
   height: var(--vh);
   margin: auto;
   position: relative;
 }
+
 .split-line {
   overflow: hidden;
 }
+
 .split-h2 {
   overflow: hidden;
   display: flex;
@@ -148,16 +160,19 @@ body {
     --cWidth: 94%;
   }
 }
+
 @media screen and (max-width: 900px) {
   .techstack h2 {
     font-size: 40px;
   }
 }
 
-html, body {
+html,
+body {
   max-width: 100%;
   overflow-x: hidden;
 }
+
 #smooth-wrapper {
   overflow-x: hidden;
   width: 100%;
@@ -168,11 +183,11 @@ html, body {
     font-size: clamp(32px, 6vw, 40px);
     top: 50px;
   }
+
   .techstack {
     margin-top: 30px;
     margin-bottom: 0px;
-    height: 80vh;
-    min-height: 480px;
+    height: 100vh;
+    min-height: 600px;
   }
 }
-

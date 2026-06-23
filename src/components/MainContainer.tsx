@@ -44,7 +44,7 @@ const TechStackLazy = () => {
 
 const MainContainer = ({ children }: PropsWithChildren) => {
   const [isDesktopView, setIsDesktopView] = useState<boolean>(
-    window.innerWidth > 1024
+    window.matchMedia("(min-width: 1025px)").matches
   );
 
   console.log(`[MainContainer Render] innerWidth=${window.innerWidth} outerWidth=${window.outerWidth} screen.width=${window.screen.width} devicePixelRatio=${window.devicePixelRatio} isDesktopView=${isDesktopView}`);
@@ -52,7 +52,7 @@ const MainContainer = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     const resizeHandler = () => {
       setSplitText();
-      const nextVal = window.innerWidth > 1024;
+      const nextVal = window.matchMedia("(min-width: 1025px)").matches;
       console.log(`[MainContainer] calling setIsDesktopView(${nextVal}) innerWidth=${window.innerWidth} screenWidth=${window.screen.width}`);
       setIsDesktopView(nextVal);
     };

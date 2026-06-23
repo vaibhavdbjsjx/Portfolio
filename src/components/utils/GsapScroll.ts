@@ -40,8 +40,6 @@ export function setCharTimeline(
     activeMobileWhatIDoTimeline = null;
   }
 
-  // Reset 3D character, camera, and DOM transforms to baseline defaults
-  // to prevent them from getting stuck in animated states when transitioning breakpoints.
   if (character) {
     character.position.set(0, 0, 0);
     character.rotation.set(0, 0, 0);
@@ -84,7 +82,7 @@ export function setCharTimeline(
       invalidateOnRefresh: true,
       onEnter: () => {
         if (character) {
-          console.log("[FORENSIC WHAT_I_DO] Enter (Before entering/just entered):", 
+          console.log("[FORENSIC WHAT_I_DO] Enter (Before entering/just entered):",
             "char.pos = (" + character.position.x + ", " + character.position.y + ", " + character.position.z + ")",
             "cam.pos = (" + camera.position.x + ", " + camera.position.y + ", " + camera.position.z + ")"
           );
@@ -92,7 +90,6 @@ export function setCharTimeline(
       },
       onUpdate: (self) => {
         if (character) {
-          // Log during scroll
           console.log("[FORENSIC WHAT_I_DO] Scrub Update (progress = " + self.progress.toFixed(2) + "):",
             "char.pos = (" + character.position.x + ", " + character.position.y + ", " + character.position.z + ")",
             "cam.pos = (" + camera.position.x + ", " + camera.position.y + ", " + camera.position.z + ")"
@@ -101,7 +98,7 @@ export function setCharTimeline(
       },
       onLeave: () => {
         if (character) {
-          console.log("[FORENSIC WHAT_I_DO] Leave (After scroll):", 
+          console.log("[FORENSIC WHAT_I_DO] Leave (After scroll):",
             "char.pos = (" + character.position.x + ", " + character.position.y + ", " + character.position.z + ")",
             "cam.pos = (" + camera.position.x + ", " + camera.position.y + ", " + camera.position.z + ")"
           );
@@ -109,7 +106,7 @@ export function setCharTimeline(
       },
       onRefresh: () => {
         if (character) {
-          console.log("[FORENSIC WHAT_I_DO] Refresh/Resize:", 
+          console.log("[FORENSIC WHAT_I_DO] Refresh/Resize:",
             "char.pos = (" + character.position.x + ", " + character.position.y + ", " + character.position.z + ")",
             "cam.pos = (" + camera.position.x + ", " + camera.position.y + ", " + camera.position.z + ")"
           );
@@ -151,12 +148,12 @@ export function setCharTimeline(
   });
 
   let neckBone = character?.getObjectByName("spine.005") || character?.getObjectByName("spine005");
-  if (window.innerWidth > 1024) {
+  if (window.matchMedia("(min-width: 1025px)").matches) {
     if (character) {
       activeTl1
         .fromTo(character.rotation, { y: 0 }, { y: 0.7, duration: 1 }, 0)
         .to(camera.position, { z: 22 }, 0)
-        .fromTo(".character-model", { xPercent: -50 }, { xPercent: -75, duration: 1 }, 0)
+        .fromTo(".character-model", { x: 0 }, { x: "-25%", duration: 1 }, 0)
         .to(".landing-container", { opacity: 0, duration: 0.4 }, 0)
         .to(".landing-container", { y: "40%", duration: 0.8 }, 0)
         .fromTo(".about-me", { y: "-50%" }, { y: "0%" }, 0);
@@ -171,8 +168,8 @@ export function setCharTimeline(
         .to(".about-section", { opacity: 0, delay: 3, duration: 2 }, 0)
         .fromTo(
           ".character-model",
-          { xPercent: -75, pointerEvents: "inherit" },
-          { xPercent: -62, pointerEvents: "none", delay: 2, duration: 5, immediateRender: false },
+          { pointerEvents: "inherit" },
+          { pointerEvents: "none", x: "-12%", delay: 2, duration: 5 },
           0
         )
         .to(character.rotation, { y: 0.92, x: 0.12, delay: 3, duration: 3 }, 0)
@@ -284,7 +281,7 @@ export function setAllTimeline() {
       0
     );
 
-  if (window.innerWidth > 1024) {
+  if (window.matchMedia("(min-width: 1025px)").matches) {
     activeCareerTimeline.fromTo(
       ".career-section",
       { y: 0 },

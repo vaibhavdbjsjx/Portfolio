@@ -35,7 +35,7 @@ const Scene = () => {
       let height = rect.height;
       if (width === 0 || height === 0) {
         width = canvasDiv.current.clientWidth || window.innerWidth;
-        height = canvasDiv.current.clientHeight || (window.innerWidth <= 768 ? window.innerHeight * 0.5 : window.innerHeight * 0.8);
+        height = canvasDiv.current.clientHeight || (window.matchMedia("(max-width: 768px)").matches ? window.innerHeight * 0.5 : window.innerHeight * 0.8);
       }
       const aspect = width / height;
       const scene = sceneRef.current;
@@ -44,7 +44,7 @@ const Scene = () => {
       try {
         renderer = new THREE.WebGLRenderer({
           alpha: true,
-          antialias: window.devicePixelRatio < 2, // Saves significant GPU load on retina screens without visual regression
+          antialias: window.devicePixelRatio < 2,
           powerPreference: "high-performance",
           failIfMajorPerformanceCaveat: false,
         });
@@ -58,7 +58,7 @@ const Scene = () => {
       console.log(`[Scene] width=${width}`);
       console.log(`[Scene] height=${height}`);
       console.log(`[Scene] cameraAspect=${aspect}`);
-      const maxPixelRatio = window.innerWidth <= 768 ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2);
+      const maxPixelRatio = window.matchMedia("(max-width: 768px)").matches ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2);
       renderer.setPixelRatio(maxPixelRatio);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1;
@@ -135,7 +135,6 @@ const Scene = () => {
           setChar(character);
           scene.add(character);
 
-
           headBone = character.getObjectByName("spine.006") || character.getObjectByName("spine006") || null;
           screenLight = character.getObjectByName("screenlight") || null;
 
@@ -198,7 +197,6 @@ const Scene = () => {
             if (child.isMesh) {
               console.log(`[FORENSIC Mesh] name="${child.name}" parent="${child.parent?.name}" pos=(${child.position.x}, ${child.position.y}, ${child.position.z})`);
               if (child.name === "screenlight") {
-                // screenlight
               } else if (child.parent && child.parent.name === "Plane004" && child.material && child.material.name === "Material.020") {
                 monitorMesh = child;
               } else if (child.name.toLowerCase().includes("monitor")) {
@@ -262,7 +260,6 @@ const Scene = () => {
             });
             setTimeout(() => {
               if (isCancelled) return;
-              // Ensure we compile timelines after loading screen is completely unmounted and layout has settled
               requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                   if (isCancelled) return;

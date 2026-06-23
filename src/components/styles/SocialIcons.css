@@ -7,30 +7,34 @@
   left: 50%;
   transform: translateX(-50%);
 }
+
 .social-icons {
   position: absolute;
   left: -20px;
   bottom: 20px;
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 8px;
   z-index: 999;
   padding: 10px;
 }
+
 .social-icons:hover {
   transition: 0.3s;
   color: var(--backgroundColor);
 }
+
 .social-icons a:hover {
   color: var(--backgroundColor);
-  /* transform: scale(1.2); */
 }
+
 .social-icons span {
   width: 50px;
   height: 50px;
   position: relative;
   display: flex;
 }
+
 .social-icons a {
   --siLeft: 50%;
   --siTop: 50%;
@@ -39,10 +43,11 @@
   top: var(--siTop, 50%);
   transform: translate(-50%, -50%);
   display: flex;
-  font-size: 23px;
+  font-size: 20px;
   will-change: left, top;
   transition: transform 0.3s ease-out;
 }
+
 .check-line {
   position: fixed;
   top: 655px;
@@ -52,12 +57,49 @@
   width: 100%;
   z-index: 99999;
 }
+
+/* Desktop - full hover effect */
 @media only screen and (min-width: 900px) {
   .social-icons {
-    display: flex;
     gap: 20px;
   }
+
   .social-icons a {
     font-size: 28px;
+  }
+}
+
+/* Mobile - show icons only, no hover animation needed */
+@media only screen and (max-width: 899px) {
+  .icons-section {
+    position: fixed;
+    bottom: auto;
+    top: auto;
+    left: 16px;
+    transform: none;
+    width: auto;
+  }
+
+  .social-icons {
+    position: fixed;
+    left: 16px;
+    bottom: 40px;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0;
+  }
+
+  .social-icons a {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    font-size: 22px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .social-icons span {
+    width: 30px;
+    height: 30px;
   }
 }
