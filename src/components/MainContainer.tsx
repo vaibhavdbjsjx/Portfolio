@@ -16,28 +16,16 @@ const TechStack = lazy(() => import("./TechStack"));
 const TechStackLazy = () => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "200px" }
-    );
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setIsVisible(true); observer.disconnect(); }
+    }, { rootMargin: "200px" });
     if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, []);
-
   return (
     <div ref={containerRef} style={{ minHeight: "500px" }}>
-      {isVisible && (
-        <Suspense fallback={<div>Loading....</div>}>
-          <TechStack />
-        </Suspense>
-      )}
+      {isVisible && (<Suspense fallback={<div>Loading....</div>}><TechStack /></Suspense>)}
     </div>
   );
 };
@@ -46,23 +34,15 @@ const MainContainer = ({ children }: PropsWithChildren) => {
   const [isDesktopView, setIsDesktopView] = useState<boolean>(
     window.matchMedia("(min-width: 1025px)").matches
   );
-
-  console.log(`[MainContainer Render] innerWidth=${window.innerWidth} outerWidth=${window.outerWidth} screen.width=${window.screen.width} devicePixelRatio=${window.devicePixelRatio} isDesktopView=${isDesktopView}`);
-
   useEffect(() => {
     const resizeHandler = () => {
       setSplitText();
-      const nextVal = window.matchMedia("(min-width: 1025px)").matches;
-      console.log(`[MainContainer] calling setIsDesktopView(${nextVal}) innerWidth=${window.innerWidth} screenWidth=${window.screen.width}`);
-      setIsDesktopView(nextVal);
+      setIsDesktopView(window.matchMedia("(min-width: 1025px)").matches);
     };
     resizeHandler();
     window.addEventListener("resize", resizeHandler);
-    return () => {
-      window.removeEventListener("resize", resizeHandler);
-    };
+    return () => { window.removeEventListener("resize", resizeHandler); };
   }, [isDesktopView]);
-
   return (
     <div className="container-main">
       <Cursor />

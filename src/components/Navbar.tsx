@@ -11,7 +11,6 @@ export let smoother: ScrollSmoother;
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => { setIsOpen(!isOpen); };
-
   useEffect(() => {
     const initSmoother = () => {
       const isDesktop = window.matchMedia("(min-width: 1025px)").matches;
@@ -71,7 +70,6 @@ const Navbar = () => {
       }
     };
   }, []);
-
   return (
     <>
       <div className="header">

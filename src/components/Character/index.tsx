@@ -3,11 +3,10 @@ import Scene from "./Scene";
 
 const CharacterModel = () => {
   useEffect(() => {
-    const isDesktop = window.innerWidth > 1024;
+    const isDesktop = window.matchMedia("(min-width: 1025px)").matches;
     console.log(isDesktop ? "DESKTOP CHARACTER MOUNTED" : "MOBILE CHARACTER MOUNTED");
-    console.log(`[CharacterModel Mount Diagnostics] innerWidth=${window.innerWidth} outerWidth=${window.outerWidth} screen.width=${window.screen.width} devicePixelRatio=${window.devicePixelRatio} isDesktopView=${isDesktop}`);
     return () => {
-      console.log(`[CharacterModel] unmounted ${isDesktop ? "desktop" : "mobile"}`);
+      console.log("[CharacterModel] unmounted");
     };
   }, []);
 
