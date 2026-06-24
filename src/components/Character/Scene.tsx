@@ -33,8 +33,6 @@ const Scene = () => {
     let width = rect.width;
     let height = rect.height;
 
-    // On Windows with 125%/150% scaling, getBoundingClientRect returns
-    // scaled-down values. Use screen dimensions as fallback for desktop.
     if (width === 0 || height === 0 || (isDesktop && height < 400 && window.screen.height > 600)) {
       width = isDesktop ? window.screen.width : (canvasDiv.current.clientWidth || window.innerWidth);
       height = isDesktop ? window.screen.height * 0.9 : (isMobile ? window.innerHeight * 0.5 : window.innerHeight * 0.8);
@@ -107,8 +105,8 @@ const Scene = () => {
     const whatIDoEl = document.querySelector(".whatIDO");
     if (whatIDoEl) visibilityObserver.observe(whatIDoEl);
 
-    const handleContextLost = (event: Event) => {
-      event.preventDefault();
+    const handleContextLost = (e: Event) => {
+      e.preventDefault();
       cancelAnimationFrame(animationFrameId);
     };
     renderer.domElement.addEventListener("webglcontextlost", handleContextLost, false);
@@ -125,9 +123,6 @@ const Scene = () => {
 
         headBone = character.getObjectByName("spine.006") || character.getObjectByName("spine006") || null;
         screenLight = character.getObjectByName("screenlight") || null;
-
-        // Small x offset to perfectly center the character model
-        character.position.x = -0.3;
 
         handleResize(renderer, camera, canvasDiv, character);
 
