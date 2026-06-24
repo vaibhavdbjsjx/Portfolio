@@ -34,6 +34,7 @@ const MainContainer = ({ children }: PropsWithChildren) => {
   const [isDesktopView, setIsDesktopView] = useState<boolean>(
     window.matchMedia("(min-width: 1025px)").matches
   );
+
   useEffect(() => {
     const resizeHandler = () => {
       setSplitText();
@@ -42,7 +43,8 @@ const MainContainer = ({ children }: PropsWithChildren) => {
     resizeHandler();
     window.addEventListener("resize", resizeHandler);
     return () => { window.removeEventListener("resize", resizeHandler); };
-  }, [isDesktopView]);
+  }, []);
+
   return (
     <div className="container-main">
       <Cursor />
