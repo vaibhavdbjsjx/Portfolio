@@ -36,13 +36,16 @@ const MainContainer = ({ children }: PropsWithChildren) => {
   );
 
   useEffect(() => {
-    const resizeHandler = () => {
+    setSplitText();
+
+    const mq = window.matchMedia("(min-width: 1025px)");
+    const handleBreakpoint = (e: MediaQueryListEvent) => {
+      setIsDesktopView(e.matches);
       setSplitText();
-      setIsDesktopView(window.matchMedia("(min-width: 1025px)").matches);
     };
-    resizeHandler();
-    window.addEventListener("resize", resizeHandler);
-    return () => { window.removeEventListener("resize", resizeHandler); };
+
+    mq.addEventListener("change", handleBreakpoint);
+    return () => mq.removeEventListener("change", handleBreakpoint);
   }, []);
 
   return (

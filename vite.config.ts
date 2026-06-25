@@ -15,9 +15,22 @@ export default defineConfig({
           next();
         });
       },
-
     },
   ],
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'three-core': ['three'],
+          'react-three': ['@react-three/fiber', '@react-three/drei'],
+          'rapier': ['@react-three/rapier'],
+          'postprocessing': ['@react-three/postprocessing'],
+          'gsap-core': ['gsap'],
+        }
+      }
+    }
+  }
 });
 
 
