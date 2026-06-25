@@ -37,13 +37,11 @@ const MainContainer = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     setSplitText();
-
     const mq = window.matchMedia("(min-width: 1025px)");
     const handleBreakpoint = (e: MediaQueryListEvent) => {
       setIsDesktopView(e.matches);
       setSplitText();
     };
-
     mq.addEventListener("change", handleBreakpoint);
     return () => mq.removeEventListener("change", handleBreakpoint);
   }, []);

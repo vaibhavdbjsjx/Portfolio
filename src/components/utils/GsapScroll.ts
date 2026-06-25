@@ -14,7 +14,6 @@ export function setCharTimeline(
   character: THREE.Object3D<THREE.Object3DEventMap> | null,
   camera: THREE.PerspectiveCamera
 ) {
-  console.log("[FORENSIC TIMELINE] setCharTimeline called");
   if (activeIntervalId) {
     clearInterval(activeIntervalId);
     activeIntervalId = null;
@@ -317,7 +316,6 @@ export function setAllTimeline() {
 }
 
 export function clearAllTimelines() {
-  console.log("[FORENSIC TIMELINE] clearAllTimelines called");
   if (activeIntervalId) {
     clearInterval(activeIntervalId);
     activeIntervalId = null;
