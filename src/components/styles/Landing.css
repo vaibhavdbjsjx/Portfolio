@@ -109,6 +109,11 @@
   z-index: 0;
   bottom: 50px;
   pointer-events: inherit;
+  /* Prevent subpixel rendering issues on Windows HiDPI Chrome */
+  -webkit-transform: translateX(-50%);
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .character-model::after {
   content: "";

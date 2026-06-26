@@ -12,47 +12,47 @@ export default function handleResize(
 ) {
   if (!canvasDiv.current) return;
 
+  // Use matchMedia for breakpoint detection - matches CSS media queries exactly
   const isDesktop = window.matchMedia("(min-width: 1025px)").matches;
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
   let canvas3d = canvasDiv.current.getBoundingClientRect();
   let width = canvas3d.width;
   let height = canvas3d.height;
 
-  // On Windows laptops with 125%/150% display scaling, window.innerHeight
-  // is scaled down (e.g. 293px instead of ~700px). We detect this by
-  // checking if height is suspiciously small for a desktop screen.
-  // window.screen.height is always the physical pixel height unaffected by scaling.
-  const screenHeight = window.screen.height;
-  const screenWidth = window.screen.width;
+  // On Windows Chrome with display scaling, getBoundingClientRect returns
+  // scaled-down values. Detect this by checking if we're on a large physical
+  // screen but getting a tiny viewport. Use screen dimensions as fallback.
+  const physicalWidth = window.screen.width;
+  const physicalHeight = window.screen.height;
 
   if (width === 0 || height === 0) {
-    width = canvasDiv.current.clientWidth || window.innerWidth;
-    height = canvasDiv.current.clientHeight || (isDesktop ? screenHeight * 0.9 : window.innerHeight * 0.5);
+    width = canvasDiv.current.clientWidth || physicalWidth;
+    height = canvasDiv.current.clientHeight || (isMobile ? physicalHeight * 0.5 : physicalHeight * 0.8);
   }
 
-  // If we are on a desktop screen (screen width >= 1200) but height is tiny
-  // (less than 400px), the viewport is being reported wrong due to OS scaling.
-  // Use screen.height as the true reference instead.
-  if (isDesktop && height < 400 && screenHeight > 600) {
-    height = screenHeight * 0.9;
-    width = screenWidth;
+  // If screen is physically large but reported height is tiny, use physical dimensions
+  if (physicalWidth >= 1200 && height < 400) {
+    width = physicalWidth;
+    height = physicalHeight * 0.9;
   }
 
   renderer.setSize(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
 
-  if (lastWasDesktop !== null && lastWasDesktop !== isDesktop) {
+  const desktop = isDesktop;
+
+  if (lastWasDesktop !== null && lastWasDesktop !== desktop) {
     const workTrigger = ScrollTrigger.getById("work");
     ScrollTrigger.getAll().forEach((trigger) => {
-      if (trigger != workTrigger) {
-        trigger.kill();
-      }
+      if (trigger !== workTrigger) trigger.kill();
     });
     setCharTimeline(character, camera);
     setAllTimeline();
   } else {
     ScrollTrigger.refresh();
   }
-  lastWasDesktop = isDesktop;
+
+  lastWasDesktop = desktop;
 }
