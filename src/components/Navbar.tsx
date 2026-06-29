@@ -13,7 +13,7 @@ const Navbar = () => {
   const toggleMenu = () => { setIsOpen(!isOpen); };
   useEffect(() => {
     const initSmoother = () => {
-      const isDesktop = window.matchMedia("(min-width: 1025px)").matches;
+      const isDesktop = (window.screen.width >= 1200 || window.matchMedia("(min-width: 1025px)").matches);
       if (isDesktop) {
         if (!smoother) {
           smoother = ScrollSmoother.create({
@@ -43,7 +43,7 @@ const Navbar = () => {
       let element = elem as HTMLAnchorElement;
       element.addEventListener("click", (e) => {
         setIsOpen(false);
-        if (window.matchMedia("(min-width: 1025px)").matches) {
+        if ((window.screen.width >= 1200 || window.matchMedia("(min-width: 1025px)").matches)) {
           e.preventDefault();
           let elem = e.currentTarget as HTMLAnchorElement;
           let section = elem.getAttribute("data-href");

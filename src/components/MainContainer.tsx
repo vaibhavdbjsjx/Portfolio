@@ -32,7 +32,7 @@ const TechStackLazy = () => {
 
 const MainContainer = ({ children }: PropsWithChildren) => {
   const [isDesktopView, setIsDesktopView] = useState<boolean>(
-    window.matchMedia("(min-width: 1025px)").matches
+    (window.screen.width >= 1200 || window.matchMedia("(min-width: 1025px)").matches)
   );
   useEffect(() => {
     setSplitText();

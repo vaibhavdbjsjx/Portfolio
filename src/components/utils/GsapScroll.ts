@@ -101,7 +101,7 @@ export function setCharTimeline(
   });
 
   let neckBone = character?.getObjectByName("spine.005") || character?.getObjectByName("spine005");
-  if (window.matchMedia("(min-width: 1025px)").matches) {
+  if (window.screen.width >= 1200 || window.matchMedia("(min-width: 1025px)").matches) {
     if (character) {
       activeTl1
         .fromTo(character.rotation, { y: 0 }, { y: 0.7, duration: 1 }, 0)
@@ -164,7 +164,7 @@ export function setAllTimeline() {
     .fromTo(".career-info-box", { opacity: 0 }, { opacity: 1, stagger: 0.1, duration: 0.5 }, 0)
     .fromTo(".career-dot", { animationIterationCount: "infinite" }, { animationIterationCount: "1", delay: 0.3, duration: 0.1 }, 0);
 
-  if (window.matchMedia("(min-width: 1025px)").matches) {
+  if (window.screen.width >= 1200 || window.matchMedia("(min-width: 1025px)").matches) {
     activeCareerTimeline.fromTo(".career-section", { y: 0 }, { y: "20%", duration: 0.5, delay: 0.2 }, 0);
   } else {
     activeCareerTimeline.fromTo(".career-section", { y: 0 }, { y: 0, duration: 0.5, delay: 0.2 }, 0);

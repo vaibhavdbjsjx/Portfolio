@@ -12,38 +12,37 @@ export default function handleResize(
 ) {
   if (!canvasDiv.current) return;
 
-  // Use matchMedia for breakpoint detection - matches CSS media queries exactly
-  const isDesktop = window.matchMedia("(min-width: 1025px)").matches;
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+  // On Windows Chrome with 150% scaling:
+  // window.screen.width = 1280 (physical)
+  // window.innerWidth = 725 (scaled wrong)
+  // matchMedia("min-width:1025px") = false (uses innerWidth)
+  // BUT the actual screen is a desktop screen.
+  // We detect this by checking physical screen width.
+  // If physical screen >= 1200px, treat as desktop regardless.
+  const physicallyDesktop = window.screen.width >= 1200;
+  const isDesktop = physicallyDesktop || window.matchMedia("(min-width: 1025px)").matches;
+  const isMobile = !physicallyDesktop && window.matchMedia("(max-width: 768px)").matches;
 
-  let canvas3d = canvasDiv.current.getBoundingClientRect();
-  let width = canvas3d.width;
-  let height = canvas3d.height;
+  // Use physical screen dimensions for canvas sizing on scaled screens
+  let width = canvasDiv.current.getBoundingClientRect().width;
+  let height = canvasDiv.current.getBoundingClientRect().height;
 
-  // On Windows Chrome with display scaling, getBoundingClientRect returns
-  // scaled-down values. Detect this by checking if we're on a large physical
-  // screen but getting a tiny viewport. Use screen dimensions as fallback.
-  const physicalWidth = window.screen.width;
-  const physicalHeight = window.screen.height;
-
-  if (width === 0 || height === 0) {
-    width = canvasDiv.current.clientWidth || physicalWidth;
-    height = canvasDiv.current.clientHeight || (isMobile ? physicalHeight * 0.5 : physicalHeight * 0.8);
+  if (width === 0 || height === 0 || (isDesktop && height < 400)) {
+    width = isDesktop ? window.screen.width : (canvasDiv.current.clientWidth || window.innerWidth);
+    height = isDesktop ? window.screen.height * 0.9 : (isMobile ? window.innerHeight * 0.5 : window.innerHeight * 0.8);
   }
 
-  // If screen is physically large but reported height is tiny, use physical dimensions
-  if (physicalWidth >= 1200 && height < 400) {
-    width = physicalWidth;
-    height = physicalHeight * 0.9;
+  // If height is still too small for a desktop screen, force correct dimensions
+  if (isDesktop && height < 400) {
+    width = window.screen.width;
+    height = window.screen.height * 0.9;
   }
 
   renderer.setSize(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
 
-  const desktop = isDesktop;
-
-  if (lastWasDesktop !== null && lastWasDesktop !== desktop) {
+  if (lastWasDesktop !== null && lastWasDesktop !== isDesktop) {
     const workTrigger = ScrollTrigger.getById("work");
     ScrollTrigger.getAll().forEach((trigger) => {
       if (trigger !== workTrigger) trigger.kill();
@@ -54,5 +53,5 @@ export default function handleResize(
     ScrollTrigger.refresh();
   }
 
-  lastWasDesktop = desktop;
+  lastWasDesktop = isDesktop;
 }
