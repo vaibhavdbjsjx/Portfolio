@@ -5,8 +5,51 @@ import {
 } from "react-icons/fa6";
 import "./styles/SocialIcons.css";
 import { useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const SocialIcons = () => {
+  /**
+   * Hide the floating icons while the Work section is on screen, restore them
+   * on the way out (both directions). Opacity only — the container stays in
+   * flow so nothing shifts, and pointer-events are disabled while faded so the
+   * invisible icons never swallow clicks.
+   */
+  useEffect(() => {
+    const icons = document.querySelector<HTMLElement>(".social-icons");
+    const work = document.querySelector<HTMLElement>(".work-section");
+    if (!icons || !work) return;
+
+    const apply = (visible: boolean, animate = true) => {
+      icons.style.pointerEvents = visible ? "auto" : "none";
+      // overwrite:"auto" kills any in-flight tween first — no flicker on fast scrolls
+      gsap.to(icons, {
+        opacity: visible ? 1 : 0,
+        duration: animate ? 0.45 : 0,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+    };
+
+    const trigger = ScrollTrigger.create({
+      trigger: work,
+      start: "top 65%",
+      end: "bottom 35%",
+      // Fires on every active/inactive flip, so it is inherently reversible.
+      onToggle: (self) => apply(!self.isActive),
+    });
+
+    // Sync initial state without animating (e.g. deep-link straight into Work)
+    apply(!trigger.isActive, false);
+
+    return () => {
+      trigger.kill();
+      gsap.killTweensOf(icons);
+    };
+  }, []);
+
   useEffect(() => {
     const social = document.getElementById("social") as HTMLElement;
 

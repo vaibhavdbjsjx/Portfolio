@@ -1,255 +1,789 @@
-.work-section h2 {
-  margin-top: 100px;
-  font-size: 70px;
-  font-weight: 500;
+/* ==========================================================================
+   MY WORK — responsive grid. No pinning, no horizontal scroll, no carousel.
+   ========================================================================== */
+
+.work-section {
+  box-sizing: border-box;
+  padding: 100px 0 120px;
 }
-.work-section h2 > span {
+
+.work-container {
+  width: var(--cWidth);
+  max-width: var(--cMaxWidth);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.work-heading {
+  font-size: clamp(40px, 6vw, 70px);
+  font-weight: 500;
+  line-height: 1.05;
+  margin: 0 0 70px;
+}
+.work-heading > span {
   color: var(--accentColor);
 }
-.work-section {
-  transition: 0s;
-  height: 100vh;
-  box-sizing: border-box;
-  will-change: transform;
-}
-.work-container {
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  align-content: stretch;
-}
-.work-flex {
-  width: 100%;
-  display: flex;
-  height: 100%;
-  margin-left: -80px;
-  padding-right: 120px;
-  position: relative;
-}
-.work-box {
-  padding: 80px;
-  display: flex;
-  flex-direction: column;
-  width: 600px;
-  box-sizing: border-box;
-  border-right: 1px solid var(--borderColor);
-  flex-shrink: 0;
-  gap: 50px;
-  justify-content: start;
-}
-.work-flex .work-box:nth-child(even) {
-  flex-direction: column-reverse;
-}
-.work-flex::before,
-.work-flex::after {
-  content: "";
-  width: calc(50000vw);
-  height: 1px;
-  background-color: var(--borderColor);
-  position: absolute;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
-}
-.work-flex::after {
-  top: 100%;
-}
-.work-title {
-  justify-content: space-between;
-  display: flex;
-  width: 100%;
-  margin-bottom: 20px;
-}
-.work-title > div {
-  text-align: right;
-}
-.work-title h3 {
-  font-size: 50px;
-  line-height: 50px;
-  margin: 0;
-  font-weight: 600;
+
+/* ---------- Category ---------- */
+
+.work-category + .work-category {
+  margin-top: 90px;
 }
 
-.work-info h4 {
-  font-size: 18px;
-  font-weight: 400;
-  margin: 0;
+.work-category-title {
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  margin: 0 0 32px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--borderColor);
 }
-.work-info p {
-  font-weight: 200;
-  color: var(--textDescriptionColor);
-  margin: 0;
-  margin-top: 3px;
+.work-category-title > span {
+  color: var(--accentColor);
 }
-.work-info > p {
-  width: 90%;
+
+/* ---------- Grid: 2 up on desktop/tablet, 1 up on mobile ---------- */
+
+.work-grid {
+  display: grid;
+  /* minmax(0,1fr) stops long content from forcing overflow */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
 }
-.work-image {
-  display: flex;
-  width: 100%;
-  justify-content: center;
+
+@media only screen and (max-width: 768px) {
+  .work-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
 }
-.work-image-in {
+
+/* ---------- Card ---------- */
+
+.pcard {
   position: relative;
-}
-.work-link {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background-color: var(--backgroundColor);
-  width: 50px;
-  border-radius: 50px;
-  height: 50px;
+  isolation: isolate;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 25px;
-  box-shadow: 0px 0px 10px 0px rgba(255, 255, 255, 0.5),
-    inset 0px 0px 10px 0px #393939;
-  transition: 0.3s;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--cardBg);
+  border: 1px solid var(--cardBorder);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  /* transform is owned by useCardFX (GSAP) — never transition it here or the
+     two would fight and drop frames. Only paint properties transition. */
+  transition: border-color 0.45s ease, box-shadow 0.45s ease;
+  will-change: transform;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+}
+
+/* Soft cursor spotlight — follows the pointer via --cx/--cy */
+.pcard-spot {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
   opacity: 0;
+  transition: opacity 0.45s ease;
+  background: radial-gradient(
+    360px circle at var(--cx, 50%) var(--cy, 50%),
+    rgba(194, 164, 255, 0.13),
+    transparent 60%
+  );
 }
-.work-image a:hover {
-  color: inherit;
+
+/* Border rim that illuminates nearest the cursor */
+.pcard-rim {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  background: radial-gradient(
+    420px circle at var(--cx, 50%) var(--cy, 50%),
+    rgba(194, 164, 255, 0.5),
+    transparent 62%
+  );
+  -webkit-mask: linear-gradient(#000, #000) content-box,
+    linear-gradient(#000, #000);
+  mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 1px;
 }
-.work-image a:hover .work-link {
+
+@media (hover: hover) and (pointer: fine) {
+  .pcard:not(.pcard-empty):hover {
+    border-color: rgba(194, 164, 255, 0.28);
+    box-shadow: 0 30px 64px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(194, 164, 255, 0.16), 0 0 54px rgba(124, 58, 237, 0.22);
+  }
+  .pcard:not(.pcard-empty):hover .pcard-spot,
+  .pcard:not(.pcard-empty):hover .pcard-rim {
+    opacity: 1;
+  }
+}
+
+/* Media frame owns the ratio → no layout shift while images load */
+.pcard-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--cardBorder);
+}
+
+/* Blurred copy of the same image, filling the letterbox area behind it.
+   Purely decorative — keeps the frame full without cropping the real image. */
+.pcard-img-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transform: scale(1.18);
+  filter: blur(26px) saturate(150%);
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+.pcard-img-bg.is-loaded {
+  opacity: 0.42;
+}
+
+/* The real image: `contain` so the FULL screenshot is always visible. */
+.pcard-img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  /* Blurred placeholder → fades in → resolves sharp */
+  opacity: 0;
+  transform: scale(1.04);
+  filter: blur(14px);
+  transition: opacity 0.55s ease, filter 0.75s ease,
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pcard-img.is-loaded {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0px);
+}
+@media (hover: hover) and (pointer: fine) {
+  .pcard:hover .pcard-img.is-loaded {
+    transform: scale(1.05);
+  }
+}
+
+/* One-shot shine sweep once the image resolves */
+.pcard-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.16) 48%,
+    rgba(194, 164, 255, 0.12) 54%,
+    transparent 64%
+  );
+  background-size: 250% 100%;
+  background-position: 150% 0;
+  animation: pcardShine 1.5s cubic-bezier(0.4, 0, 0.2, 1) 0.15s 1 forwards;
+}
+@keyframes pcardShine {
+  to {
+    background-position: -120% 0;
+  }
+}
+
+/* Neutral frame when no image has been supplied yet */
+.pcard-img-empty {
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(194, 164, 255, 0.06)
+  );
+}
+
+.pcard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  flex-grow: 1;
+}
+
+/* Title + one-line subtitle sit together, actions push to the bottom */
+.pcard-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pcard-title {
+  margin: 0;
+  font-size: clamp(19px, 2vw, 23px);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  line-height: 1.25;
+  color: var(--textColor);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
+}
+
+.pcard-subtitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.45;
+  letter-spacing: 0.2px;
+  color: var(--textDescriptionColor);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.03s,
+    color 0.4s ease;
+}
+
+/* Tiny title lift + subtitle brighten on hover */
+@media (hover: hover) and (pointer: fine) {
+  .pcard:hover .pcard-title {
+    transform: translateY(-2px);
+  }
+  .pcard:hover .pcard-subtitle {
+    transform: translateY(-1px);
+    color: var(--textColor);
+  }
+}
+
+/* ==========================================================================
+   PREMIUM ACTION CONTROLS
+   Hairline rings instead of borders, glass surface, pointer-tracked
+   illumination, drifting sheen, ripple. All motion is transform/opacity only.
+   ========================================================================== */
+
+.pcard-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+}
+
+/* ---------- Read Me: soft glass pill, no hard border ---------- */
+
+.pcard-readme-btn,
+.readme-close {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  color: var(--textColor);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  transition: box-shadow 0.4s ease, color 0.35s ease, background-color 0.35s ease;
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keep label + icon above the decorative layers */
+.pcard-readme-btn > *,
+.readme-close > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Pointer-tracked illumination (coords come from useButtonFX) */
+.pcard-readme-btn::before,
+.readme-close::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(
+    120px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(194, 164, 255, 0.26),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.pcard-readme-btn:hover::before,
+.readme-close:hover::before {
   opacity: 1;
 }
-.work-image video {
+
+.pcard-readme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  color: var(--textColor);
+  background-color: rgba(255, 255, 255, 0.055);
+  /* Hairline ring, not a border — no thickness, no hard edge */
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.11), 0 2px 10px rgba(0, 0, 0, 0.22);
+}
+
+.pcard-readme-label {
+  line-height: 1;
+}
+
+.pcard-readme-icon {
+  font-size: 15px;
+  opacity: 0.75;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.35s ease;
+}
+
+.pcard-readme-btn:hover {
+  color: #fff;
+  background-color: rgba(194, 164, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(194, 164, 255, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 6px 20px rgba(0, 0, 0, 0.34),
+    0 0 22px rgba(124, 58, 237, 0.24);
+}
+.pcard-readme-btn:hover .pcard-readme-icon {
+  opacity: 1;
+  transform: translate(2px, -2px);
+}
+
+.readme-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  font-size: 18px;
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 4px 14px rgba(0, 0, 0, 0.3);
+}
+.readme-close:hover {
+  color: var(--accentColor);
+  box-shadow: inset 0 0 0 1px rgba(194, 164, 255, 0.38),
+    0 8px 22px rgba(0, 0, 0, 0.4), 0 0 22px rgba(124, 58, 237, 0.24);
+}
+.readme-close svg {
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.readme-close:hover svg {
+  transform: rotate(90deg);
+}
+
+/* Spring press */
+.pcard-readme-btn:active,
+.readme-close:active {
+  transform: scale(0.96);
+  transition: transform 0.1s ease;
+}
+
+/* ---------- GitHub: bare icon, no chrome ---------- */
+
+.pcard-gh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  font-size: 20px;
+  line-height: 0;
+  color: var(--textDescriptionColor);
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.35s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.35s ease, opacity 0.35s ease;
+}
+
+.pcard-gh:hover {
+  color: var(--accentColor);
+  transform: scale(1.16) rotate(8deg);
+  filter: drop-shadow(0 0 10px rgba(194, 164, 255, 0.65));
+}
+
+.pcard-gh:active {
+  transform: scale(1.04) rotate(4deg);
+  transition: transform 0.1s ease;
+}
+
+/* Disabled placeholder — same footprint, no layout change */
+.pcard-gh.is-disabled {
+  color: var(--textDescriptionColor);
+  opacity: 0.28;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Click ripple (element injected by useButtonFX) */
+.btn-ripple {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
+  z-index: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: scale(0);
+  opacity: 0.65;
+  background: radial-gradient(
+    circle,
+    rgba(194, 164, 255, 0.4),
+    transparent 62%
+  );
+  animation: fxRipple 0.66s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes fxRipple {
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* ---------- Empty reserved slot ---------- */
+
+.pcard-empty {
+  border-style: dashed;
+  border-color: var(--dashedBorder);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.pcard-empty .pcard-media {
+  opacity: 0.35;
+  border-bottom-style: dashed;
+  border-bottom-color: var(--dashedBorder);
+}
+.pcard-empty .pcard-body {
+  align-items: center;
+  justify-content: center;
+  padding: 20px 24px;
+}
+.pcard-slot-label {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--textDescriptionColor);
+  opacity: 0.65;
+}
+
+/* ---------- Focus states ---------- */
+
+.pcard-readme-btn:focus-visible,
+.pcard-gh:focus-visible,
+.readme-close:focus-visible,
+.readme-scroll:focus-visible,
+.readme-code:focus-visible {
+  outline: 2px solid var(--accentColor);
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   README MODAL — glass panel over a blurred backdrop
+   ========================================================================== */
+
+.readme-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  box-sizing: border-box;
+  background: rgba(6, 4, 8, 0.66);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+  backdrop-filter: blur(16px) saturate(125%);
+}
+
+.readme-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(880px, 100%);
+  max-height: min(86vh, 920px);
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    rgba(28, 22, 34, 0.94),
+    rgba(18, 14, 22, 0.96)
+  );
+  box-shadow: inset 0 0 0 1px rgba(194, 164, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 44px 110px rgba(0, 0, 0, 0.66),
+    0 0 80px rgba(124, 58, 237, 0.14);
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
+  will-change: transform;
+}
+
+.readme-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 32px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.readme-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.readme-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: var(--accentColor);
+  opacity: 0.75;
+}
+
+.readme-title {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 31px);
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 1.15;
+  color: var(--textColor);
+}
+
+/* Scrollable body */
+.readme-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 30px 32px 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(194, 164, 255, 0.3) transparent;
+}
+.readme-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+.readme-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.readme-scroll::-webkit-scrollbar-thumb {
+  background: rgba(194, 164, 255, 0.26);
+  border-radius: 10px;
+  /* inset the thumb from the panel edge */
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.readme-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(194, 164, 255, 0.5);
+  background-clip: content-box;
+}
+
+.readme-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Section titles: small caps label with a hairline accent rule */
+.readme-section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accentColor);
+}
+.readme-section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(194, 164, 255, 0.28),
+    transparent 80%
+  );
+}
+
+.readme-text {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.78;
+  font-weight: 300;
+  letter-spacing: 0.1px;
+  color: rgba(234, 229, 236, 0.9);
+}
+.readme-text + .readme-text {
+  margin-top: 14px;
+}
+
+.readme-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.readme-list li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 15.5px;
+  line-height: 1.7;
+  font-weight: 300;
+  color: rgba(234, 229, 236, 0.9);
+}
+.readme-list li::before {
+  content: "";
+  position: absolute;
   left: 0;
-  background-color: #000;
-  object-fit: cover;
+  top: 0.66em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accentColor);
+  box-shadow: 0 0 10px rgba(194, 164, 255, 0.6);
 }
-.work-image img {
-  max-width: 100%;
-  max-height: 350px;
+
+.readme-tags {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
 }
-@media only screen and (max-height: 900px) {
-  .work-image img {
-    max-height: 250px;
-  }
-  .work-box {
-    padding-top: 40px;
-    padding-bottom: 40px;
-  }
-  .work-section h2 {
-    font-size: 60px;
-    margin-bottom: 30px;
-    margin-top: 70px;
-  }
+.readme-tags li {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+  padding: 6px 14px;
+  border-radius: 30px;
+  color: rgba(234, 229, 236, 0.92);
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: box-shadow 0.3s ease, color 0.3s ease;
 }
-@media only screen and (max-width: 1400px) {
-  .work-title h3 {
-    font-size: 35px;
+.readme-tags li:hover {
+  color: var(--accentColor);
+  box-shadow: inset 0 0 0 1px rgba(194, 164, 255, 0.4);
+}
+
+/* Code */
+.readme-inline-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  padding: 2px 7px;
+  border-radius: 6px;
+  color: #e2d3ff;
+  background: rgba(194, 164, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(194, 164, 255, 0.18);
+}
+
+.readme-code {
+  margin: 4px 0 0;
+  padding: 18px 20px;
+  border-radius: 14px;
+  overflow-x: auto;
+  background: rgba(0, 0, 0, 0.38);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(194, 164, 255, 0.3) transparent;
+}
+.readme-code code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #d9cdf5;
+  white-space: pre;
+}
+.readme-code::-webkit-scrollbar {
+  height: 8px;
+}
+.readme-code::-webkit-scrollbar-thumb {
+  background: rgba(194, 164, 255, 0.28);
+  border-radius: 8px;
+}
+
+.readme-empty {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--textDescriptionColor);
+}
+
+@media only screen and (max-width: 768px) {
+  .work-section {
+    padding: 70px 0 80px;
   }
-  .work-info p {
-    font-size: 13px;
+  .work-heading {
+    margin-bottom: 46px;
   }
-  .work-info h4 {
+  .work-category + .work-category {
+    margin-top: 64px;
+  }
+  .readme-overlay {
+    padding: 14px;
+  }
+  .readme-panel {
+    max-height: 90vh;
+    border-radius: 20px;
+  }
+  .readme-head {
+    padding: 22px 20px 18px;
+  }
+  .readme-scroll {
+    padding: 24px 20px 28px;
+    gap: 28px;
+  }
+  .readme-text,
+  .readme-list li {
     font-size: 15px;
   }
-  .work-box {
-    width: 450px;
-    padding: 50px;
-  }
-  .work-flex {
-    margin-left: -50px;
-    padding-right: 75px;
-  }
-  .work-section h2 {
-    font-size: 50px;
-  }
-}
-@media only screen and (max-width: 1400px) {
-  .work-box {
-    width: 350px;
-    padding: 30px;
-  }
-  .work-flex {
-    margin-left: -30px;
-    padding-right: 45px;
-  }
 }
 
-@media only screen and (max-height: 650px) {
-  .work-image img {
-    max-height: 200px;
+/* Respect reduced-motion for all decorative transitions */
+@media (prefers-reduced-motion: reduce) {
+  .pcard,
+  .pcard-img,
+  .pcard-title,
+  .pcard-subtitle,
+  .pcard-readme-btn,
+  .pcard-readme-icon,
+  .pcard-gh,
+  .readme-close,
+  .readme-close svg {
+    transition: none;
   }
-  .work-section h2 {
-    font-size: 40px;
-    margin-bottom: 20px;
-  }
-  .work-box {
-    gap: 20px;
-  }
-}
-/* @media only screen and (max-width: 900px) {
-  .work-image img {
-    max-height: 200px;
-  }
-  .work-section h2 {
-    font-size: 40px;
-    margin-bottom: 20px;
-  }
-  .work-box {
-    gap: 20px;
-  }
-} */
-@media only screen and (max-width: 991px) {
-  .work-section {
-    height: auto;
-    padding: 80px 0px;
-  }
-  .work-container {
-    height: auto;
-    width: var(--cWidth);
-    margin: auto;
-    align-content: normal;
-  }
-  .work-flex {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 40px;
-    margin-left: 0;
-    padding-right: 0;
-    width: 100%;
-    height: auto;
-  }
-  .work-flex::before,
-  .work-flex::after {
+  .pcard-shine {
+    animation: none;
     display: none;
   }
-  .work-box {
-    width: 100%;
-    padding: 30px;
-    border-right: none;
-    border-bottom: 1px solid var(--borderColor);
-    box-sizing: border-box;
-    gap: 30px;
-  }
-  .work-box:nth-child(even) {
-    flex-direction: column;
+  .btn-ripple {
+    display: none;
   }
 }
-
-@media only screen and (max-width: 767px) {
-  .work-flex {
-    grid-template-columns: 1fr;
-    gap: 30px;
-  }
-  .work-box {
-    padding: 20px;
-  }
-  .work-section h2 {
-    font-size: clamp(36px, 8vw, 48px);
-    margin-top: 40px;
-    margin-bottom: 30px;
-    text-align: center;
-  }
-}
-

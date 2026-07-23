@@ -21,7 +21,7 @@ const Career = () => {
               <h3>2020</h3>
             </div>
             <p>
-              Completed secondary education with SSLC score of 89.4%.
+              Completed Secondary Education (SSLC).
             </p>
           </div>
           <div className="career-info-box">
@@ -33,7 +33,7 @@ const Career = () => {
               <h3>2022</h3>
             </div>
             <p>
-              Completed Pre-University Course (PUC) with a score of 80.6%.
+              Completed Pre-University Course (PUC).
             </p>
           </div>
           <div className="career-info-box">

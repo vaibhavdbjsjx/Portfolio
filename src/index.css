@@ -35,22 +35,6 @@
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-:root.light-mode {
-  color-scheme: light;
-  --accentColor: #7c4dff;
-  --backgroundColor: #f7f5fa;
-  --textColor: #1c1921;
-  --textDescriptionColor: #5c5660;
-  --cardBg: rgba(0, 0, 0, 0.02);
-  --cardBorder: rgba(0, 0, 0, 0.08);
-  --timelineColor: rgba(0, 0, 0, 0.08);
-  --dashedBorder: rgba(0, 0, 0, 0.15);
-  --borderColor: #dcd6ce;
-  --socialCircleBg: rgba(0, 0, 0, 0.03);
-  --tagBg: rgba(0, 0, 0, 0.05);
-  --tagBorder: rgba(0, 0, 0, 0.12);
-}
-
 :root {
   --vh: 100vh;
   --vh: 100svh;

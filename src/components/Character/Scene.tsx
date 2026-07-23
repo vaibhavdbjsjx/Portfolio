@@ -4,7 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import setCharacter from "./utils/character";
 import setLighting from "./utils/lighting";
 import { useLoading } from "../../context/LoadingProvider";
-import handleResize from "./utils/resizeUtils";
+import handleResize, { syncRendererToContainer } from "./utils/resizeUtils";
 import {
   handleMouseMove,
   handleTouchEnd,
@@ -26,19 +26,6 @@ const Scene = () => {
     let isCancelled = false;
     if (!canvasDiv.current) return;
 
-    const isDesktop = window.matchMedia("(min-width: 1025px)").matches;
-    const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-    let rect = canvasDiv.current.getBoundingClientRect();
-    let width = rect.width;
-    let height = rect.height;
-
-    if (width === 0 || height === 0 || (isDesktop && height < 400 && window.screen.height > 600)) {
-      width = isDesktop ? window.screen.width : (canvasDiv.current.clientWidth || window.innerWidth);
-      height = isDesktop ? window.screen.height * 0.9 : (isMobile ? window.innerHeight * 0.5 : window.innerHeight * 0.8);
-    }
-
-    const aspect = width / height;
     const scene = sceneRef.current;
 
     let renderer: THREE.WebGLRenderer;
@@ -54,26 +41,71 @@ const Scene = () => {
       return;
     }
 
-    renderer.setSize(width, height);
-    const maxPixelRatio = isMobile
-      ? Math.min(window.devicePixelRatio, 1.5)
-      : Math.min(window.devicePixelRatio, 2);
-    renderer.setPixelRatio(maxPixelRatio);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1;
     canvasDiv.current.appendChild(renderer.domElement);
 
-    const camera = new THREE.PerspectiveCamera(14.5, aspect, 0.1, 1000);
+    // Aspect is a placeholder — the ResizeObserver below fires immediately on
+    // observe() and sets the real value from the container's measured box.
+    const camera = new THREE.PerspectiveCamera(14.5, 1, 0.1, 1000);
     camera.position.set(0, 13.1, 24.7);
     camera.zoom = 1.1;
     camera.updateProjectionMatrix();
+
+    // Size the buffer from the container before first paint.
+    syncRendererToContainer(renderer, camera, canvasDiv.current);
 
     let headBone: THREE.Object3D | null = null;
     let screenLight: any | null = null;
     let mixer: THREE.AnimationMixer;
     let animationFrameId: number;
-    let resizeListener: (() => void) | undefined;
-    let resizeTimeout: any;
+    let loadedCharacter: THREE.Object3D | null = null;
+
+    /* ------------------------------------------------------------------
+       Deterministic sizing.
+
+       The container element is the only input. A ResizeObserver catches every
+       box change — window resize, browser zoom, scrollbar appearing,
+       ScrollSmoother re-layout, mobile URL-bar collapse — including the ones
+       that fire no window "resize" event. Callbacks are coalesced into one
+       rAF so a drag-resize costs at most one sync per frame.
+       ------------------------------------------------------------------ */
+    let syncFrame = 0;
+
+    const runSync = () => {
+      syncFrame = 0;
+      if (isCancelled || !canvasDiv.current) return;
+      if (loadedCharacter) {
+        handleResize(renderer, camera, canvasDiv, loadedCharacter);
+      } else {
+        syncRendererToContainer(renderer, camera, canvasDiv.current);
+      }
+    };
+
+    const scheduleSync = () => {
+      if (!syncFrame) syncFrame = requestAnimationFrame(runSync);
+    };
+
+    const resizeObserver = new ResizeObserver(scheduleSync);
+    resizeObserver.observe(canvasDiv.current);
+
+    /* devicePixelRatio changes (dragging to a different-DPI monitor, or
+       browser zoom) do not necessarily change the element's CSS box, so
+       ResizeObserver alone would miss them. Watch the resolution directly and
+       re-arm after each change, since the query is DPR-specific. */
+    let dprQuery: MediaQueryList | null = null;
+    const onDprChange = () => {
+      scheduleSync();
+      watchDpr();
+    };
+    function watchDpr() {
+      dprQuery?.removeEventListener("change", onDprChange);
+      dprQuery = window.matchMedia(
+        `(resolution: ${window.devicePixelRatio}dppx)`
+      );
+      dprQuery.addEventListener("change", onDprChange);
+    }
+    watchDpr();
 
     const clock = new THREE.Clock();
     const light = setLighting(scene);
@@ -141,13 +173,9 @@ const Scene = () => {
           }, 2500);
         });
 
-        resizeListener = () => {
-          clearTimeout(resizeTimeout);
-          resizeTimeout = setTimeout(() => {
-            if (!isCancelled) handleResize(renderer, camera, canvasDiv, character);
-          }, 150);
-        };
-        window.addEventListener("resize", resizeListener);
+        // The observer is already running; hand it the character so breakpoint
+        // changes can rebuild the timeline from here on.
+        loadedCharacter = character;
       }
     }).catch((err) => {
       console.error("Failed to load character:", err);
@@ -195,14 +223,15 @@ const Scene = () => {
     return () => {
       isCancelled = true;
       visibilityObserver.disconnect();
+      resizeObserver.disconnect();
+      dprQuery?.removeEventListener("change", onDprChange);
+      if (syncFrame) cancelAnimationFrame(syncFrame);
       clearTimeout(debounce);
-      clearTimeout(resizeTimeout);
       clearAllTimelines();
       cancelAnimationFrame(animationFrameId);
       scene.clear();
       renderer.domElement.removeEventListener("webglcontextlost", handleContextLost);
       renderer.dispose();
-      if (resizeListener) window.removeEventListener("resize", resizeListener);
       if (canvasDiv.current) canvasDiv.current.removeChild(renderer.domElement);
       document.removeEventListener("mousemove", onMouseMove);
       if (landingDiv) {

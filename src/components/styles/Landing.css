@@ -99,7 +99,7 @@
 }
 .character-model {
   height: 80%;
-  height: 80vh;
+  height: calc(var(--vh) * 0.8);
   position: absolute;
   max-width: 1920px;
   max-height: 1080px;
@@ -146,8 +146,15 @@
   animation-delay: 0.3s;
   opacity: 0;
 }
+/* CSS owns the canvas box; WebGL only owns the drawing buffer.
+   Because the canvas is always 100% of its container, the character can never
+   drift or crop even if a resize notification is late — the worst case is one
+   frame at a stale buffer resolution. */
 .character-model canvas {
   position: relative;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
   pointer-events: none;
   z-index: 2;
 }
@@ -277,7 +284,7 @@ h2.landing-info-h2 {
 }
 @media screen and (min-width: 768px) {
   .character-model {
-    height: 80vh;
+    height: calc(var(--vh) * 0.8);
   }
   .landing-intro h2 {
     font-size: 25px;
@@ -299,7 +306,7 @@ h2.landing-info-h2 {
 }
 @media screen and (min-width: 1025px) {
   .character-model {
-    height: 100vh;
+    height: var(--vh);
     bottom: 0;
     z-index: 11;
     position: fixed;
@@ -308,39 +315,36 @@ h2.landing-info-h2 {
   .character-model::before {
     display: none;
   }
+  /* Hero alignment.
+     Both blocks are anchored by their TOP EDGE at the same coordinate rather
+     than each being centred on its own height — centring made the first-line
+     tops diverge by half the height difference (measured: 12px). Top-edge
+     anchoring guarantees "Hello! I'm" and "AI &" share a baseline at any
+     viewport or content length.
+     --heroGutter keeps the two inner edges equidistant from the character. */
+  .landing-intro,
+  .landing-info {
+    --heroGutter: 210px;
+    top: 44%;
+    transform: none;
+  }
   .landing-intro {
-    top: 50%;
     left: auto;
-    right: calc(50% + 240px);
-    transform: translate(0%, -50%);
+    right: calc(50% + var(--heroGutter));
   }
 
   .landing-info {
     bottom: auto;
-    top: 51%;
     z-index: inherit;
     text-align: left;
-    transform: translate(0%, -50%);
     right: auto;
-    left: calc(50% + 180px);
+    left: calc(50% + var(--heroGutter));
   }
 }
 @media screen and (min-width: 1200px) {
-  .landing-intro {
-    top: 50%;
-    left: auto;
-    right: calc(50% + 280px);
-    transform: translate(0%, -50%);
-  }
-
+  .landing-intro,
   .landing-info {
-    bottom: auto;
-    top: 51%;
-    z-index: inherit;
-    text-align: left;
-    transform: translate(0%, -50%);
-    right: auto;
-    left: calc(50% + 220px);
+    --heroGutter: 250px;
   }
 }
 @media screen and (min-width: 1600px) {
@@ -402,7 +406,7 @@ h2.landing-info-h2 {
   
   .character-model {
     position: relative;
-    height: 50vh;
+    height: calc(var(--vh) * 0.5);
     width: 100%;
     left: auto;
     transform: none !important;
