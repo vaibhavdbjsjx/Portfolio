@@ -26,3 +26,8 @@ dist-ssr
 
 backup/
 .env
+# Local tooling & build cache (not needed for deployment)
+.claude/
+*.tsbuildinfo
+scratch/
+lint_output.txt
