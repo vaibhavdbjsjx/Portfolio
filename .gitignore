@@ -31,3 +31,4 @@ backup/
 *.tsbuildinfo
 scratch/
 lint_output.txt
+.assets-archive/

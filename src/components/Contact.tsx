@@ -1,8 +1,47 @@
-import { useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 import { MdCopyright } from "react-icons/md";
-import EarthCanvas from "./EarthCanvas";
 import "./styles/Contact.css";
+
+/**
+ * The contact globe pulls in @react-three/fiber + drei + three (~1.1 MB).
+ * Importing it statically put that whole stack in the ENTRY chunk, so the
+ * browser modulepreloaded it before the hero could paint. Loading it lazily —
+ * and only once the section is near the viewport — keeps Three.js out of the
+ * critical path entirely.
+ */
+const EarthCanvas = lazy(() => import("./EarthCanvas"));
+
+const LazyGlobe = () => {
+  const holderRef = useRef<HTMLDivElement>(null);
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    const el = holderRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShow(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div ref={holderRef} className="contact-globe">
+      {show && (
+        <Suspense fallback={null}>
+          <EarthCanvas />
+        </Suspense>
+      )}
+    </div>
+  );
+};
 
 const Contact = () => {
   const formRef = useRef<HTMLFormElement>(null);
@@ -116,9 +155,7 @@ const Contact = () => {
           </div>
 
           <div className="contact-right">
-            <div className="contact-globe">
-              <EarthCanvas />
-            </div>
+            <LazyGlobe />
             <div className="contact-credit">
               <h2>Designed and Developed <br /> by <span>Vaibhav S G</span></h2>
               <h5><MdCopyright /> 2026</h5>

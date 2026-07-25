@@ -157,20 +157,20 @@ const Scene = () => {
         progress.loaded().then(() => {
           if (isCancelled) return;
           handleResize(renderer, camera, canvasDiv, character);
-          setTimeout(() => {
-            if (isCancelled) return;
+          // Two rAFs are enough to guarantee layout has settled before the
+          // timelines are measured. The old fixed 2.5s wait was dead time on
+          // top of an already-finished model load.
+          requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              requestAnimationFrame(() => {
-                if (isCancelled) return;
-                handleResize(renderer, camera, canvasDiv, character);
-                setCharTimeline(character, camera);
-                setAllTimeline();
-                ScrollTrigger.refresh();
-                light.turnOnLights();
-                animations.startIntro();
-              });
+              if (isCancelled) return;
+              handleResize(renderer, camera, canvasDiv, character);
+              setCharTimeline(character, camera);
+              setAllTimeline();
+              ScrollTrigger.refresh();
+              light.turnOnLights();
+              animations.startIntro();
             });
-          }, 2500);
+          });
         });
 
         // The observer is already running; hand it the character so breakpoint

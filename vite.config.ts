@@ -19,17 +19,13 @@ export default defineConfig({
   ],
   build: {
     chunkSizeWarningLimit: 1000,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'three-core': ['three'],
-          'react-three': ['@react-three/fiber', '@react-three/drei'],
-          'rapier': ['@react-three/rapier'],
-          'postprocessing': ['@react-three/postprocessing'],
-          'gsap-core': ['gsap'],
-        }
-      }
-    }
+    // NOTE: no manualChunks on purpose.
+    // Listing three / @react-three / rapier as manual chunks promoted them into
+    // the entry's STATIC graph, so index.html modulepreloaded ~1.1 MB of
+    // Three.js before the hero could paint — even though every consumer
+    // (Character, TechStack, EarthCanvas) is behind a dynamic import.
+    // Letting Rollup split naturally keeps those libraries inside the async
+    // chunks that actually use them.
   }
 });
 

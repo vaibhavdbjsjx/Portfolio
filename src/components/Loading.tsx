@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./styles/Loading.css";
 import { useLoading } from "../context/LoadingProvider";
 
@@ -9,40 +9,40 @@ const Loading = ({ percent }: { percent: number }) => {
   const [loaded, setLoaded] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [clicked, setClicked] = useState(false);
+  const timers = useRef<number[]>([]);
 
-  if (percent >= 100) {
-    setTimeout(() => {
+  // Was called during render, which re-scheduled duplicate timers on every
+  // re-render once percent hit 100. Effect + guard fixes that, and the waits
+  // are trimmed to what the dismissal animation actually needs.
+  useEffect(() => {
+    if (percent < 100 || loaded) return;
+    const t1 = window.setTimeout(() => {
       setLoaded(true);
-      setTimeout(() => {
-        setIsLoaded(true);
-      }, 1000);
-    }, 600);
-  }
+      const t2 = window.setTimeout(() => setIsLoaded(true), 260);
+      timers.current.push(t2);
+    }, 120);
+    timers.current.push(t1);
+  }, [percent, loaded]);
 
   useEffect(() => {
-    import("./utils/initialFX").then((module) => {
-      if (isLoaded) {
-        setClicked(true);
-        setTimeout(() => {
-          if (module.initialFX) {
-            module.initialFX();
-          }
-          // Safely unpause ScrollSmoother after dismissal when it is guaranteed to be initialized
-          import("./Navbar").then((nav) => {
-            if (nav.smoother) {
-              nav.smoother.paused(false);
-            }
-          });
-          setIsLoading(false);
-          setTimeout(() => {
-            import("gsap/ScrollTrigger").then((gsapTrigger) => {
-              gsapTrigger.ScrollTrigger.refresh();
-            });
-          }, 150);
-        }, 900);
-      }
-    });
+    if (!isLoaded) return;
+
+    setClicked(true);
+    const t = window.setTimeout(() => {
+      import("./utils/initialFX").then((module) => module.initialFX?.());
+      // Safely unpause ScrollSmoother after dismissal when it is guaranteed to be initialized
+      import("./Navbar").then((nav) => nav.smoother?.paused(false));
+      setIsLoading(false);
+      const t2 = window.setTimeout(() => {
+        import("gsap/ScrollTrigger").then((m) => m.ScrollTrigger.refresh());
+      }, 150);
+      timers.current.push(t2);
+    }, 420);
+    timers.current.push(t);
   }, [isLoaded]);
+
+  // Clear any pending timers if the loader unmounts mid-sequence
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   function handleMouseMove(e: React.MouseEvent<HTMLElement>) {
     const { currentTarget: target } = e;
