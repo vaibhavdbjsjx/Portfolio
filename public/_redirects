@@ -1,0 +1,6 @@
+# Netlify SPA fallback: deep links like /mywork/hiringbuddy (used by the résumé
+# PDF) must serve the single-page app so the Work section can open that
+# project's Read Me. Real asset folders are matched as files first and are
+# unaffected.
+/mywork/*   /index.html   200
+/*          /index.html   200
