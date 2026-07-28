@@ -23,7 +23,7 @@ const certifications = [
     name: "Google AI Essentials",
     issuer: "Google",
     image: "/certificates/google.jpg",
-    url: "https://coursera.org/share/90adfb0fee09afd5edf5873a11e29e54",
+    url: "https://www.coursera.org/account/accomplishments/specialization/YMPYI9MCNFTM",
   },
 ];
 

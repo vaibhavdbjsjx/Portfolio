@@ -103,14 +103,22 @@
   position: absolute;
   max-width: 1920px;
   max-height: 1080px;
-  transform: translateX(-50%);
   width: 100%;
-  left: 50%;
+  /* CENTERING MUST NOT USE `transform`.
+     GsapScroll animates `x` on this same element (x: 0 -> "-25%"). GSAP writes
+     a fresh transform matrix, which wipes any translateX(-50%) used for
+     centering — leaving the element at left:50% with no correction, i.e. shoved
+     half a viewport to the right. That raced against the clearProps() reset, so
+     it broke on some machines/browsers and not others.
+     Auto margins center it in the layout engine instead, where GSAP can never
+     clobber it, and `x` stays a pure offset from a stable centre. */
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
   z-index: 0;
   bottom: 50px;
   pointer-events: inherit;
-  /* Prevent subpixel rendering issues on Windows HiDPI Chrome */
-  -webkit-transform: translateX(-50%);
   will-change: transform;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -347,6 +355,44 @@ h2.landing-info-h2 {
     --heroGutter: 250px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   NARROW-DESKTOP HERO (1025–1599px)
+
+   Windows laptops running 150% / 175% display scaling report a CSS viewport of
+   roughly 1097–1280px in Chrome (1920 ÷ 1.75 = 1097, 1920 ÷ 1.5 = 1280), while
+   Firefox on the same machine reports ~1920px. That is why the hero looked
+   correct in Firefox but clipped in Chrome on identical hardware.
+
+   At those widths each side column only gets `50vw - heroGutter` of space, and
+   the fixed 55px headline overflowed the right edge by up to 75px (measured at
+   1097px). Scaling the gutter and type with the viewport keeps both columns
+   inside the screen at every width in this range.
+
+   Deliberately scoped to max-width:1599px so the ≥1600px design is untouched.
+--------------------------------------------------------------------------- */
+@media screen and (min-width: 1025px) and (max-width: 1599px) {
+  .landing-intro,
+  .landing-info {
+    --heroGutter: clamp(130px, 16vw, 250px);
+  }
+  .landing-intro h2,
+  .landing-info h3 {
+    font-size: clamp(16px, 1.95vw, 35px);
+  }
+  .landing-intro h1 {
+    font-size: clamp(26px, 3.2vw, 60px);
+    line-height: 1.05;
+  }
+  .landing-info h2 {
+    font-size: clamp(28px, 3.5vw, 65px);
+    line-height: 1.05;
+  }
+  h2.landing-info-h2 {
+    font-size: clamp(32px, 4.2vw, 75px);
+  }
+}
+
 @media screen and (min-width: 1600px) {
   .landing-intro h2 {
     font-size: 35px;
@@ -409,8 +455,9 @@ h2.landing-info-h2 {
     height: calc(var(--vh) * 0.5);
     width: 100%;
     left: auto;
+    right: auto;
     transform: none !important;
-    margin: 20px 0;
+    margin: 20px auto;
     bottom: auto;
   }
   

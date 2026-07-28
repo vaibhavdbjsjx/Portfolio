@@ -183,3 +183,71 @@
     gap: 8px;
   }
 }
+/* ---------------------------------------------------------------------------
+   SHORT DESKTOP VIEWPORTS
+
+   On desktop `.about-section` is locked to one viewport height (var(--vh)).
+   A Windows laptop at 150–175% scaling gives Chrome a viewport only ~618–720px
+   tall, while this block's content measured 951px — so it overflowed its own
+   section and bled up over the hero (the "About text on top of the character"
+   symptom). Tightening type and spacing keeps it inside a short viewport.
+--------------------------------------------------------------------------- */
+@media only screen and (min-width: 1025px) and (max-height: 820px) {
+  .about-me h3 {
+    font-size: 18px;
+    letter-spacing: 4px;
+    margin-bottom: 14px;
+  }
+  .about-content {
+    gap: 10px;
+  }
+  .about-me p.para {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .mindset-section {
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+  .mindset-title {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .mindset-list {
+    gap: 7px;
+  }
+  .mindset-list li {
+    font-size: 13px;
+    padding-left: 17px;
+  }
+}
+
+/* Very short viewports (≈1920x1080 @175% → 618px tall): tighten further so the
+   About block still fits inside its one-viewport-tall section. */
+@media only screen and (min-width: 1025px) and (max-height: 700px) {
+  .about-me h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  .about-content {
+    gap: 8px;
+  }
+  .about-me p.para {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .mindset-section {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+  .mindset-title {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .mindset-list {
+    gap: 5px;
+  }
+  .mindset-list li {
+    font-size: 12px;
+  }
+}

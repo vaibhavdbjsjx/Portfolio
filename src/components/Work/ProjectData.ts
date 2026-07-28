@@ -65,7 +65,7 @@ export interface Project {
   title: string;
   /** One short line under the title, e.g. "AI-Powered Recruitment Platform". */
   subtitle: string;
-  /** Path under /public, e.g. "/images/hiringbuddy.webp". "" = no image yet. */
+  /** Path under /public, e.g. "/images/hiringbuddy.png". "" = no image yet. */
   image: string;
   /** Full repo URL. "" hides the GitHub button. */
   github: string;
@@ -122,7 +122,7 @@ export const projects: Project[] = [
     id: "hiringbuddy",
     title: "HiringBuddy",
     subtitle: "AI-Powered Recruitment Platform",
-    image: "/images/hiringbuddy.webp",
+    image: "/images/hiringbuddy.png",
     github: "https://github.com/vaibhavdbjsjx/HiringBUddy",
     category: "ai-ml",
     readme: {
@@ -172,7 +172,7 @@ export const projects: Project[] = [
     id: "ml-deepshield",
     title: "ML DeepShield",
     subtitle: "AI Security & Threat Detection",
-    image: "/images/deepshield.webp",
+    image: "/images/deepshield.png",
     github: "https://github.com/vaibhavdbjsjx/deepshield-ai",
     category: "ai-ml",
     readme: {
@@ -378,7 +378,7 @@ export const projects: Project[] = [
     id: "solar-monitor",
     title: "Solar Monitor",
     subtitle: "AI Powered Solar Energy Monitor App",
-    image: "/images/surya_shakti.webp",
+    image: "/images/surya_shakti.png",
     github: "https://github.com/vaibhavdbjsjx/Surya-Shakti-Solar-Monitor",
     category: "mobile",
     readme: {
