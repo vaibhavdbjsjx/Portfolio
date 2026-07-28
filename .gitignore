@@ -32,3 +32,10 @@ backup/
 scratch/
 lint_output.txt
 .assets-archive/
+
+# Dev-only scratch file (kept out of the repo since ccc7d4a)
+test.js
+
+# Unused asset: not referenced by any component, so it would only add
+# dead weight to every deploy. Delete this line if it gets used.
+public/images/vaibhav.webp
