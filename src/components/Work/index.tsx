@@ -33,6 +33,14 @@ const Work = () => {
   // Keep the URL in sync so an open modal is itself shareable/refreshable.
   const openProject = (project: Project | null) => {
     setActiveProject(project);
+
+    // Record which projects actually get read (silent, best-effort).
+    if (project) {
+      import("../../utils/analytics")
+        .then((m) => m.trackEvent("project_open", { project: project.id }))
+        .catch(() => {});
+    }
+
     try {
       if (project) {
         window.history.replaceState(null, "", `/mywork/${project.id}`);
@@ -74,6 +82,12 @@ const Work = () => {
         workEl.scrollIntoView();
       }
       setActiveProject(project);
+
+      // A deep-link open means someone followed the résumé/CV link for this
+      // project — the highest-signal event on the site.
+      import("../../utils/analytics")
+        .then((m) => m.trackEvent("project_open", { project: project.id }))
+        .catch(() => {});
     };
 
     openWhenReady();
